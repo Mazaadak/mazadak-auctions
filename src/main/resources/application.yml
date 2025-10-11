@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: auctions
+  config:
+    import: "optional:configserver:localhost:18071"
