@@ -25,7 +25,12 @@ public class Auction extends BaseEntity {
     @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false)
+    private BigDecimal startingPrice;
+
     private BigDecimal reservePrice = BigDecimal.valueOf(0.00);
+
+    private BigDecimal highestBidPlaced = startingPrice;
 
     @Column(nullable = false)
     private BigDecimal bidIncrement;
@@ -40,6 +45,9 @@ public class Auction extends BaseEntity {
     @Column(nullable = false)
     @Setter(AccessLevel.NONE)
     private AuctionStatus status = AuctionStatus.SCHEDULED;
+
+    @Version
+    private Long version;
 
     public void setStatus(AuctionStatus newStatus) {
         if (!this.status.canTransitionTo(newStatus)) {
