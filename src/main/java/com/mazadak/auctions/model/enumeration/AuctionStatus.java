@@ -10,11 +10,12 @@ public enum AuctionStatus {
 
     public boolean canTransitionTo(AuctionStatus target) {
         return switch(this) {
-            case SCHEDULED -> target == STARTED || target == CANCELLED;
-            case STARTED -> target == ACTIVE || target == ENDED || target == PAUSED || target == CANCELLED;
-            case ACTIVE -> target == ENDED;
-            case ENDED, CANCELLED -> false;
-            case PAUSED -> target == STARTED;
+            case SCHEDULED -> target == STARTED || target == CANCELLED || target == SCHEDULED;
+            case STARTED -> target == SCHEDULED || target == ACTIVE || target == ENDED || target == PAUSED || target == CANCELLED || target == STARTED;
+            case ACTIVE -> target == ENDED || target == ACTIVE;
+            case ENDED -> target == ENDED;
+            case CANCELLED -> target == CANCELLED;
+            case PAUSED -> target == STARTED || target == PAUSED;
         };
     }
 }

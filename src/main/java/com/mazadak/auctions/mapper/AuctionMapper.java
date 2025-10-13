@@ -2,6 +2,7 @@ package com.mazadak.auctions.mapper;
 
 import com.mazadak.auctions.dto.AuctionDto;
 import com.mazadak.auctions.dto.request.CreateAuctionRequest;
+import com.mazadak.auctions.dto.response.AuctionResponse;
 import com.mazadak.auctions.model.entity.Auction;
 
 public class AuctionMapper {
@@ -32,6 +33,22 @@ public class AuctionMapper {
                 dto.getEndTime(),
                 dto.getStatus(),
                 1L
+        );
+    }
+
+    public static AuctionResponse toResponseDto(Auction auction) {
+        return new AuctionResponse(
+                auction.getId(),
+                auction.getProductId(),
+                auction.getSellerId(),
+                auction.getTitle(),
+                auction.getStartingPrice(),
+                auction.getReservePrice(),
+                auction.getHighestBidPlaced(),
+                auction.getBidIncrement(),
+                auction.getStartTime(),
+                auction.getEndTime(),
+                auction.getStatus()
         );
     }
 }

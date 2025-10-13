@@ -3,9 +3,13 @@ package com.mazadak.auctions.controller;
 import com.mazadak.auctions.dto.AuctionDto;
 import com.mazadak.auctions.dto.AuctionFilterDto;
 import com.mazadak.auctions.dto.request.CreateAuctionRequest;
+import com.mazadak.auctions.dto.request.UpdateAuctionRequest;
+import com.mazadak.auctions.dto.response.AuctionResponse;
 import com.mazadak.auctions.model.entity.Auction;
 import com.mazadak.auctions.service.AuctionService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -44,6 +48,12 @@ public class AuctionController {
             @PageableDefault(sort = "startTime", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         return auctionService.findAuctionsByCriteria(filter, pageable);
+    }
+
+    @PutMapping("{id}")
+    ResponseEntity<AuctionResponse> updateAuction(@PathVariable Long id,
+                                                  @Valid @RequestBody UpdateAuctionRequest request) {
+        return ResponseEntity.ok(auctionService.updateAuction(id, request));
     }
 
     // temp

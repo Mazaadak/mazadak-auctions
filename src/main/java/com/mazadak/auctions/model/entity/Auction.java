@@ -53,5 +53,6 @@ public class Auction extends BaseEntity {
         if (!this.status.canTransitionTo(newStatus)) {
             throw new IllegalAuctionStatusTransitionException("Cannot transition auction status from " + this.status + " to " + newStatus, this.status, newStatus);
         }
+        this.status = newStatus;
     }
 }
