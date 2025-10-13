@@ -7,6 +7,7 @@ import com.mazadak.auctions.dto.response.AuctionResponse;
 import com.mazadak.auctions.service.AuctionService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -60,5 +61,23 @@ public class AuctionController {
     @PostMapping
     ResponseEntity<AuctionResponse> createAuction(@Valid @RequestBody CreateAuctionRequest dto) {
         return ResponseEntity.ok(auctionService.createAuction(dto));
+    }
+
+    // TODO: authorization
+    @PostMapping("{id}/cancel")
+    ResponseEntity<AuctionResponse> cancelAuction(@PathVariable Long id) {
+        return ResponseEntity.ok(auctionService.cancelAuction(id));
+    }
+
+    // TODO: authorization
+    @PostMapping("{id}/pause")
+    ResponseEntity<AuctionResponse> pauseAuction(@PathVariable Long id) {
+        return ResponseEntity.ok(auctionService.pauseAuction(id));
+    }
+
+    // TODO: authorization
+    @PostMapping("{id}/resume")
+    ResponseEntity<AuctionResponse> resumeAuction(@PathVariable Long id) {
+        return ResponseEntity.ok(auctionService.resumeAuction(id));
     }
 }

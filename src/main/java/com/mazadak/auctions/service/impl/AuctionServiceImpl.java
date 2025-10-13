@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.repository.core.support.RepositoryMethodInvocationListener;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AuctionServiceImpl implements AuctionService {
     private final AuctionRepository auctionRepository;
+    private final RepositoryMethodInvocationListener repositoryMethodInvocationListener;
 
     @Override
     public AuctionResponse findAuctionById(Long id) {
@@ -79,9 +81,52 @@ public class AuctionServiceImpl implements AuctionService {
                 .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", id.toString()));
 
         if (isAuctionActive(auction)) {
-            throw new InvalidAuctionOperationException("Cannot update an auction that's already active", auction.getId());
+            throw new InvalidAuctionOperationException("Cannot update an auction that is already active", auction.getId());
         }
 
         auctionRepository.delete(auction);
+    }
+
+    @Override
+    public AuctionResponse cancelAuction(Long id) {
+        var auction = auctionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", id.toString()));
+
+        if (isAuctionActive(auction)) {
+            throw new InvalidAuctionOperationException("Cannot cancel an active auction.", id);
+        }
+
+        auction.setStatus(AuctionStatus.CANCELLED);
+        return AuctionMapper.toResponseDto(auctionRepository.save(auction));
+    }
+
+    @Override
+    public AuctionResponse pauseAuction(Long id) {
+        var auction = auctionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", id.toString()));
+
+        if (isAuctionActive(auction)) {
+            throw new InvalidAuctionOperationException("Cannot pause an active auction.", id);
+        }
+
+        if (auction.getStatus() != AuctionStatus.STARTED) {
+            throw new InvalidAuctionOperationException("Cannot pause an active that is not started.", id);
+        }
+
+        auction.setStatus(AuctionStatus.PAUSED);
+        return AuctionMapper.toResponseDto(auctionRepository.save(auction));
+    }
+
+    @Override
+    public AuctionResponse resumeAuction(Long id) {
+        var auction = auctionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", id.toString()));
+
+        if (auction.getStatus() != AuctionStatus.PAUSED) {
+            throw new InvalidAuctionOperationException("Cannot resume an auction that is not paused.", id);
+        }
+
+        auction.setStatus(AuctionStatus.STARTED);
+        return AuctionMapper.toResponseDto(auctionRepository.save(auction));
     }
 }
