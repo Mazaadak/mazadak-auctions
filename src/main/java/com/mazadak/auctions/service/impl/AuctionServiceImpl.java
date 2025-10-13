@@ -52,8 +52,8 @@ public class AuctionServiceImpl implements AuctionService {
         var auction = auctionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", id.toString()));
 
-        if (auction.getStatus() == AuctionStatus.ACTIVE || auction.getHighestBidPlaced().compareTo(BigDecimal.ZERO) > 0) {
-            throw new InvalidAuctionOperationException("Cannot update an auction that's already active", id);
+        if (isAuctionActive(auction)) {
+            throw new InvalidAuctionOperationException("Cannot update an auction that's already active", auction.getId());
         }
 
         auction.setProductId(request.productId());
@@ -72,5 +72,21 @@ public class AuctionServiceImpl implements AuctionService {
         auctionRepository.save(auction);
 
         return AuctionMapper.toResponseDto(auction);
+    }
+
+    private boolean isAuctionActive(Auction auction) {
+        return auction.getStatus() == AuctionStatus.ACTIVE || auction.getHighestBidPlaced().compareTo(BigDecimal.ZERO) > 0;
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        var auction = auctionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", id.toString()));
+
+        if (isAuctionActive(auction)) {
+            throw new InvalidAuctionOperationException("Cannot update an auction that's already active", auction.getId());
+        }
+
+        auctionRepository.delete(auction);
     }
 }

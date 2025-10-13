@@ -56,6 +56,12 @@ public class AuctionController {
         return ResponseEntity.ok(auctionService.updateAuction(id, request));
     }
 
+    @DeleteMapping("{id}")
+    ResponseEntity<Void> deleteAuction(@PathVariable Long id) {
+        auctionService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
     // temp
     @PostMapping
     ResponseEntity<Auction> createAuction(@RequestBody CreateAuctionRequest dto) {

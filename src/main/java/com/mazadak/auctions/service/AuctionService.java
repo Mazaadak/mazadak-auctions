@@ -16,4 +16,5 @@ public interface AuctionService {
     Page<AuctionDto> findAuctionsByCriteria(AuctionFilterDto filter, Pageable pageable);
     Auction createAuction(CreateAuctionRequest dto);
     AuctionResponse updateAuction(Long id, UpdateAuctionRequest request);
+    void deleteById(Long id);
 }
