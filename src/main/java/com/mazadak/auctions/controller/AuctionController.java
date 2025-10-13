@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 )
 @Validated
 @AllArgsConstructor
+@CrossOrigin("*")
 public class AuctionController {
     private final AuctionService auctionService;
     private final Logger logger = LoggerFactory.getLogger(AuctionController.class);
