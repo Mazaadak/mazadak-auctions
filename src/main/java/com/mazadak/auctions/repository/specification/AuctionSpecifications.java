@@ -1,6 +1,6 @@
 package com.mazadak.auctions.repository.specification;
 
-import com.mazadak.auctions.dto.AuctionFilterDto;
+import com.mazadak.auctions.dto.request.AuctionFilterDto;
 import com.mazadak.auctions.model.entity.Auction;
 import org.springframework.data.jpa.domain.Specification;
 

@@ -1,7 +1,6 @@
 package com.mazadak.auctions.service.impl;
 
-import com.mazadak.auctions.dto.AuctionDto;
-import com.mazadak.auctions.dto.AuctionFilterDto;
+import com.mazadak.auctions.dto.request.AuctionFilterDto;
 import com.mazadak.auctions.dto.request.CreateAuctionRequest;
 import com.mazadak.auctions.dto.request.UpdateAuctionRequest;
 import com.mazadak.auctions.dto.response.AuctionResponse;
@@ -19,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -28,23 +26,24 @@ public class AuctionServiceImpl implements AuctionService {
     private final AuctionRepository auctionRepository;
 
     @Override
-    public AuctionDto findAuctionById(Long id) {
+    public AuctionResponse findAuctionById(Long id) {
         var auction = auctionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction", "Id", id.toString()));
 
-        return AuctionMapper.toDto(auction);
+        return AuctionMapper.toResponseDto(auction);
     }
 
     @Override
-    public Page<AuctionDto> findAuctionsByCriteria(AuctionFilterDto filter, Pageable pageable) {
+    public Page<AuctionResponse> findAuctionsByCriteria(AuctionFilterDto filter, Pageable pageable) {
         Specification<Auction> specification = AuctionSpecifications.buildFromFilter(filter);
         return auctionRepository.findAll(specification, pageable)
-                .map(AuctionMapper::toDto);
+                .map(AuctionMapper::toResponseDto);
     }
 
     @Override
-    public Auction createAuction(CreateAuctionRequest dto) {
-        return auctionRepository.save(AuctionMapper.toEntity(dto));
+    public AuctionResponse createAuction(CreateAuctionRequest dto) {
+        var saved = auctionRepository.save(AuctionMapper.toEntity(dto));
+        return AuctionMapper.toResponseDto(saved);
     }
 
     @Override

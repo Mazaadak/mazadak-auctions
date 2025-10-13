@@ -1,4 +1,4 @@
-package com.mazadak.auctions.dto;
+package com.mazadak.auctions.dto.request;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
