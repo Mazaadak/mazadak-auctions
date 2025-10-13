@@ -1,6 +1,7 @@
 package com.mazadak.auctions.dto.request;
 
 import com.mazadak.auctions.validation.annotation.ValidReservePrice;
+import com.mazadak.auctions.validation.annotation.ValidStartAndEndTimes;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
  * DTO for {@link com.mazadak.auctions.model.entity.Auction}
  */
 @ValidReservePrice
+@ValidStartAndEndTimes
 public record UpdateAuctionRequest(@NotNull(message = "An auction must be associated with a product") Long productId,
                                    @NotBlank(message = "Auction title cannot be blank") String title,
                                    @NotNull(message = "Starting price cannot be empty") @Min(message = "Starting price cannot be less than $1", value = 1) BigDecimal startingPrice,

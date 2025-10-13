@@ -5,14 +5,23 @@ import com.mazadak.auctions.validation.annotation.ValidReservePrice;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class ReservePriceValidator implements ConstraintValidator<ValidReservePrice, UpdateAuctionRequest> {
+import java.math.BigDecimal;
+
+public class ReservePriceValidator implements ConstraintValidator<ValidReservePrice, Object> {
 
     @Override
-    public boolean isValid(UpdateAuctionRequest value, ConstraintValidatorContext context) {
-        if (value.reservePrice() == null || value.startingPrice() == null) {
-            return true; // handled by @NotNull
-        }
+    public boolean isValid(Object value, ConstraintValidatorContext context) {
+        try {
+            var startingPrice = (BigDecimal) value.getClass().getMethod("startingPrice").invoke(value);
+            var reservePrice = (BigDecimal) value.getClass().getMethod("reservePrice").invoke(value);
 
-        return value.reservePrice().compareTo(value.startingPrice()) >= 0;
+            if (reservePrice == null || startingPrice == null) {
+                return true; // handled by @NotNull
+            }
+
+            return reservePrice.compareTo(startingPrice) >= 0;
+        } catch (Exception e) {
+            return true;
+        }
     }
 }

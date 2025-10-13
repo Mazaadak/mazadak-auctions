@@ -4,6 +4,9 @@ import com.mazadak.auctions.dto.AuctionDto;
 import com.mazadak.auctions.dto.request.CreateAuctionRequest;
 import com.mazadak.auctions.dto.response.AuctionResponse;
 import com.mazadak.auctions.model.entity.Auction;
+import com.mazadak.auctions.model.enumeration.AuctionStatus;
+
+import java.time.LocalDateTime;
 
 public class AuctionMapper {
     public static AuctionDto toDto(Auction auction) {
@@ -22,16 +25,16 @@ public class AuctionMapper {
 
     public static Auction toEntity(CreateAuctionRequest dto) {
         return new Auction(
-                dto.getProductId(),
-                dto.getSellerId(),
-                dto.getTitle(),
-                dto.getStartingPrice(),
-                dto.getReservePrice(),
-                dto.getHighestBidPlaced(),
-                dto.getBidIncrement(),
-                dto.getStartTime(),
-                dto.getEndTime(),
-                dto.getStatus(),
+                dto.productId(),
+                dto.sellerId(),
+                dto.title(),
+                dto.startingPrice(),
+                dto.reservePrice(),
+                null,
+                dto.bidIncrement(),
+                dto.startTime(),
+                dto.endTime(),
+                AuctionStatus.SCHEDULED,
                 1L
         );
     }

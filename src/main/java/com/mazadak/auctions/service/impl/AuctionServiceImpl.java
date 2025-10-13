@@ -65,17 +65,13 @@ public class AuctionServiceImpl implements AuctionService {
         auction.setStatus(auction.getStartTime().isAfter(LocalDateTime.now()) ? AuctionStatus.SCHEDULED : AuctionStatus.STARTED);
         auction.setEndTime(request.endTime());
 
-        if (auction.getStartTime().isAfter(auction.getEndTime())) {
-            throw new InvalidAuctionOperationException("Start time has to be before end time", id);
-        }
-
         auctionRepository.save(auction);
 
         return AuctionMapper.toResponseDto(auction);
     }
 
     private boolean isAuctionActive(Auction auction) {
-        return auction.getStatus() == AuctionStatus.ACTIVE || auction.getHighestBidPlaced().compareTo(BigDecimal.ZERO) > 0;
+        return auction.getStatus() == AuctionStatus.ACTIVE;
     }
 
     @Override

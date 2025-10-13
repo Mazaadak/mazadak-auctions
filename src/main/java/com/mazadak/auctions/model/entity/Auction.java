@@ -1,6 +1,6 @@
 package com.mazadak.auctions.model.entity;
 
-import com.mazadak.auctions.exception.IllegalAuctionStatusTransitionException;
+import com.mazadak.auctions.exception.InvalidAuctionStatusTransitionException;
 import com.mazadak.auctions.model.enumeration.AuctionStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,9 +28,9 @@ public class Auction extends BaseEntity {
     @Column(nullable = false)
     private BigDecimal startingPrice;
 
-    private BigDecimal reservePrice = BigDecimal.valueOf(0.00);
+    private BigDecimal reservePrice = startingPrice;
 
-    private BigDecimal highestBidPlaced = startingPrice;
+    private BigDecimal highestBidPlaced;
 
     @Column(nullable = false)
     private BigDecimal bidIncrement;
@@ -51,7 +51,7 @@ public class Auction extends BaseEntity {
 
     public void setStatus(AuctionStatus newStatus) {
         if (!this.status.canTransitionTo(newStatus)) {
-            throw new IllegalAuctionStatusTransitionException("Cannot transition auction status from " + this.status + " to " + newStatus, this.status, newStatus);
+            throw new InvalidAuctionStatusTransitionException("Cannot transition auction status from " + this.status + " to " + newStatus, this.status, newStatus);
         }
         this.status = newStatus;
     }
