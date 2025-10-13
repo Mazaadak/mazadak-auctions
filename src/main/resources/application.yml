@@ -2,4 +2,27 @@ spring:
   application:
     name: auctions
   config:
-    import: "optional:configserver:localhost:18071"
+    import: "optional:configserver:http://localhost:18071/"
+  datasource:
+    url: jdbc:h2:mem:auctiondb;
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  h2:
+    console:
+      enabled: true
+  cloud:
+    bus:
+      enabled: false
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+springdoc:
+  show-spring-cloud-functions: false
