@@ -26,7 +26,6 @@ public class ValidBidPlacementValidator implements ConstraintValidator<ValidBidP
     private final AuctionRepository auctionRepository;
     private final BidRepository bidRepository;
 
-
     /**
      * Validates a {@link PlaceBidRequest} for placing a bid on an auction.
      *

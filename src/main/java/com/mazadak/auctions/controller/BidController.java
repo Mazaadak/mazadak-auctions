@@ -32,6 +32,7 @@ public class BidController {
 
     private final BidService bidService;
 
+    // TODO: authentication
     @Operation(
             summary = "Place a bid on an auction",
             description = "Places a bid for the auction identified by auctionId."

@@ -24,8 +24,6 @@ public class BidServiceImpl implements BidService {
     private final AuctionRepository auctionRepository;
     private final BidRepository bidRepository;
 
-
-
     /**
      * Places a bid for the given auction.
      *
