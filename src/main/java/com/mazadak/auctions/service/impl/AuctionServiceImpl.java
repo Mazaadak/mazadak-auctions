@@ -8,8 +8,10 @@ import com.mazadak.auctions.exception.InvalidAuctionOperationException;
 import com.mazadak.auctions.exception.ResourceNotFoundException;
 import com.mazadak.auctions.mapper.AuctionMapper;
 import com.mazadak.auctions.model.entity.Auction;
+import com.mazadak.auctions.model.entity.AuctionWatch;
 import com.mazadak.auctions.model.enumeration.AuctionStatus;
 import com.mazadak.auctions.repository.AuctionRepository;
+import com.mazadak.auctions.repository.AuctionWatchRepository;
 import com.mazadak.auctions.repository.specification.AuctionSpecifications;
 import com.mazadak.auctions.service.AuctionService;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +24,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class AuctionServiceImpl implements AuctionService {
     private final AuctionRepository auctionRepository;
-    private final RepositoryMethodInvocationListener repositoryMethodInvocationListener;
+    private final AuctionWatchRepository auctionWatchRepository;
 
     @Override
     public AuctionResponse findAuctionById(Long id) {
@@ -163,5 +166,30 @@ public class AuctionServiceImpl implements AuctionService {
 
         auction.setStatus(AuctionStatus.STARTED);
         return AuctionMapper.toResponseDto(auctionRepository.save(auction));
+    }
+
+    @Override
+    public void addWatcher(Long id, Long userId) {
+        var auction = auctionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", id.toString()));
+
+        var watch = new AuctionWatch(auction, userId, false);
+
+        auctionWatchRepository.save(watch);
+    }
+
+    @Override
+    public void removeWatcher(Long id, Long userId) {
+        var watch = auctionWatchRepository.findAuctionWatchByUserIdAndAuction_Id(userId, id)
+                .orElseThrow(() -> new ResourceNotFoundException("AuctionWatch", "userId, id", userId + ", " + id));
+
+        auctionWatchRepository.delete(watch);
+    }
+
+    @Override
+    public List<Long> getWatcherIds(Long id) {
+        return auctionWatchRepository.findAllByAuction_Id(id)
+                .stream()
+                .toList();
     }
 }

@@ -18,7 +18,15 @@ spring:
   cloud:
     bus:
       enabled: false
-
+    stream:
+      bindings:
+        auctionStarted-out-0:
+          destination: auction-started
+          content-type: application/json
+      kafka:
+        binder:
+          brokers: localhost:9092
+        
 logging:
   level:
     org.hibernate.SQL: DEBUG
