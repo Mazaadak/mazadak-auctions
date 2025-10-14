@@ -19,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(
         value = "/auctions",
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 )
 @Validated
 @AllArgsConstructor
+@CrossOrigin("*")
 public class AuctionController {
     private final AuctionService auctionService;
     private final Logger logger = LoggerFactory.getLogger(AuctionController.class);
@@ -79,5 +82,22 @@ public class AuctionController {
     @PostMapping("{id}/resume")
     ResponseEntity<AuctionResponse> resumeAuction(@PathVariable Long id) {
         return ResponseEntity.ok(auctionService.resumeAuction(id));
+    }
+
+    @PostMapping("{id}/watch")
+    ResponseEntity<Void> watchAuction(@PathVariable Long id, @RequestHeader("X-User-Id") Long userId) {
+        auctionService.addWatcher(id, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("{id}/unwatch")
+    ResponseEntity<Void> unwatchAuction(@PathVariable Long id, @RequestHeader("X-User-Id") Long userId) {
+        auctionService.removeWatcher(id, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("{id}/watchers")
+    ResponseEntity<List<Long>> getWatchers(@PathVariable Long id) {
+        return ResponseEntity.ok(auctionService.getWatcherIds(id));
     }
 }
