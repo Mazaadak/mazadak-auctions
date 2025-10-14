@@ -54,15 +54,9 @@ public class BidController {
             @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Auction not found", content = @Content)
     })
-    @PostMapping("/{id}/bids")
+    @PostMapping("/{auctionId}/bids")
     public ResponseEntity<BidResponse> placeBid(
-            @Parameter(description = "ID of the auction", required = true)
-            @PathVariable Long id,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Bid details",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = PlaceBidRequest.class))
-            )
+            @PathVariable Long auctionId,
             @Valid @RequestBody PlaceBidRequest request
     ) {
         // TODO: handle if the auctionId in /{auctionId}/bids is different than the auctionId inside the request body
@@ -72,29 +66,68 @@ public class BidController {
         return ResponseEntity.status(HttpStatus.CREATED).body(bidResponse);
     }
 
+
+    @Operation(
+            summary = "Get bids for an auction",
+            description = "Returns a paginated list of bids for the specified auction. Optionally filter by bidderId."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Bids retrieved",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = BidResponse.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Auction not found", content = @Content)
+    })
     @GetMapping("/{auctionId}/bids")
     public ResponseEntity<Page<BidResponse>> getBids(@PathVariable Long auctionId,
                                                      @RequestParam(required = false) Long bidderId,
-                                                     @PageableDefault(size = 10) @SortDefault.SortDefaults({
+                                                     @PageableDefault @SortDefault.SortDefaults({
                                                              @SortDefault(sort = "amount", direction = Sort.Direction.DESC),
                                                              @SortDefault(sort = "createdAt", direction = Sort.Direction.ASC)
                                                      }) Pageable pageable) {
         return ResponseEntity.ok(bidService.getBids(auctionId, bidderId, pageable));
     }
 
+
+    @Operation(
+            summary = "Get highest bid for an auction",
+            description = "Returns the highest bid amount for the specified auction."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Highest bid retrieved",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = BigDecimal.class))
+            ),
+            @ApiResponse(responseCode = "404", description = "Auction not found", content = @Content)
+    })
     @GetMapping("/{auctionId}/bids/highest")
     public ResponseEntity<BigDecimal> getHighestBid(@PathVariable Long auctionId) {
         BigDecimal highestBid = bidService.getHighestBid(auctionId);
         return ResponseEntity.ok(highestBid);
     }
 
+
+    @Operation(
+            summary = "Get bids by bidder",
+            description = "Returns a paginated list of bids placed by the specified bidder across auctions."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Bids retrieved for bidder",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = BidResponse.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Bidder not found", content = @Content)
+    })
     @GetMapping("/bidder/{bidderId}/bids")
     public ResponseEntity<Page<BidResponse>> getBidsByBidder(@PathVariable Long bidderId,
-                                                             @PageableDefault(
-                                                                     size = 10,
-                                                                     sort = "createdAt",
-                                                                     direction = Sort.Direction.ASC
-                                                             ) Pageable pageable) {
+                                                             @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
         return ResponseEntity.ok(bidService.getBidsByBidder(bidderId, pageable));
     }
 
