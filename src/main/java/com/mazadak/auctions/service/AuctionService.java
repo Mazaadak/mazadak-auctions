@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 
 public interface AuctionService {
     // CRUD
@@ -21,4 +23,9 @@ public interface AuctionService {
     AuctionResponse cancelAuction(Long id);
     AuctionResponse pauseAuction(Long id);
     AuctionResponse resumeAuction(Long id);
+
+    // WATCH
+    void addWatcher(Long id, Long userId);
+    void removeWatcher(Long id, Long userId);
+    List<Long> getWatcherIds(Long id);
 }
