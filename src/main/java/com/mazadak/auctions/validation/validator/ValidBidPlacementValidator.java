@@ -64,11 +64,18 @@ public class ValidBidPlacementValidator implements ConstraintValidator<ValidBidP
             return violation(constraintValidatorContext, "Cannot place bid: auction has not started");
         }
 
-        BigDecimal currentHighestBid = Optional.ofNullable(auction.getHighestBidPlaced()).orElse(auction.getStartingPrice());
-        BigDecimal minAllowedBid = currentHighestBid.add(auction.getBidIncrement());
-        if (request.getAmount().compareTo(minAllowedBid) < 0) {
-            return violation(constraintValidatorContext, "Bid must be at least: " + minAllowedBid);
-        }
+        /*
+        * This validation make the POST request non-idempotent, in case of a repeated request with the same idempotency key
+        * The request is validated here first, so it becomes invalid because the amount is the same as the previous request
+        * If the previous request places the bid successfully, then bidding with the same amount returns error response regardless of idempotency key.
+        * */
+
+        // TODO: remove completely? this is re-validated anyway when the record is locked when placing a bid.
+//        BigDecimal currentHighestBid = Optional.ofNullable(auction.getHighestBidPlaced()).orElse(auction.getStartingPrice());
+//        BigDecimal minAllowedBid = currentHighestBid.add(auction.getBidIncrement());
+//        if (request.getAmount().compareTo(minAllowedBid) < 0) {
+//            return violation(constraintValidatorContext, "Bid must be at least: " + minAllowedBid);
+//        }
 
         if (Objects.equals(request.getBidderId(), auction.getSellerId())) {
             return violation(constraintValidatorContext, "Seller cannot bid on their own auction");

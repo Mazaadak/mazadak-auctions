@@ -68,7 +68,6 @@ public class BidServiceImpl implements BidService {
         BigDecimal minAllowedBid = currentHighestBid.add(auction.getBidIncrement());
         if (request.getAmount().compareTo(minAllowedBid) < 0) {
             throw new IllegalArgumentException("Bid must be at least: " + minAllowedBid); // TODO: make custom exception?
-
         }
 
         Bid newBid = new Bid(
