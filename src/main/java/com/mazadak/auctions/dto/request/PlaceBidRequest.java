@@ -1,5 +1,8 @@
 package com.mazadak.auctions.dto.request;
 
+import com.mazadak.auctions.validation.annotation.ValidBidPlacement;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Value;
 
 import java.io.Serializable;
@@ -10,17 +13,17 @@ import java.util.UUID;
  * DTO for {@link com.mazadak.auctions.model.entity.Bid}
  */
 @Value
-
+@ValidBidPlacement
 public class PlaceBidRequest implements Serializable {
-    Long auctionId;
-    Long bidderId;
+    @NotNull(message = "A bid must be associated with an auction") Long auctionId;
+    @NotNull(message = "A bid must be associated with a bidder") Long bidderId;
+
+    @NotNull(message = "A bid must have an amount")
+    @Positive(message = "Bid amount must be positive")
     BigDecimal amount;
+
     String idempotencyKey;
 }
 
-/* TODO: Validation
-    auction.status == ACTIVE (if not make it active + check status transition rules in auctions)
-    amount >= current_highest_bid + increment
-    auction.start_time <= now < auction.end_time
-    bidder != seller
-* */
+
+// @NotNull(message = "An auction must be associated with a product")
