@@ -2,6 +2,7 @@ package com.mazadak.auctions.service.impl;
 
 import com.mazadak.auctions.dto.request.PlaceBidRequest;
 import com.mazadak.auctions.dto.response.BidResponse;
+import com.mazadak.auctions.exception.InvalidBIdAmountException;
 import com.mazadak.auctions.exception.ResourceNotFoundException;
 import com.mazadak.auctions.mapper.BidMapper;
 import com.mazadak.auctions.model.entity.Auction;
@@ -67,7 +68,7 @@ public class BidServiceImpl implements BidService {
         BigDecimal currentHighestBid = Optional.ofNullable(auction.getHighestBidPlaced()).orElse(auction.getStartingPrice());
         BigDecimal minAllowedBid = currentHighestBid.add(auction.getBidIncrement());
         if (request.getAmount().compareTo(minAllowedBid) < 0) {
-            throw new IllegalArgumentException("Bid must be at least: " + minAllowedBid); // TODO: make custom exception?
+            throw new InvalidBIdAmountException(request.getAmount(), minAllowedBid);
         }
 
         Bid newBid = new Bid(
