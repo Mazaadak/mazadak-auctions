@@ -84,4 +84,13 @@ public class BidServiceImpl implements BidService {
 
         return BidMapper.toBidResponse(newBid);
     }
+
+    @Override
+    public BigDecimal getHighestBid(Long auctionId) {
+        Auction auction = auctionRepository.findById(auctionId).orElseThrow(
+                () -> new ResourceNotFoundException("Auction", "auctionId", auctionId.toString())
+        );
+
+        return auction.getHighestBidPlaced();
+    }
 }

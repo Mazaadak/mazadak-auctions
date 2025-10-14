@@ -19,6 +19,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Parameter;
 
+import java.math.BigDecimal;
+
 
 @Tag(name = "Bids", description = "Operations related to bids")
 @RestController
@@ -64,4 +66,11 @@ public class BidController {
         // TODO: Handle XSS Vulnerability
         return ResponseEntity.status(HttpStatus.CREATED).body(bidResponse);
     }
+
+    @GetMapping("/{id}/bids/highest")
+    public ResponseEntity<BigDecimal> getHighestBid(@PathVariable Long id) {
+        BigDecimal highestBid = bidService.getHighestBid(id);
+        return ResponseEntity.ok(highestBid);
+    }
+
 }
