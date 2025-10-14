@@ -65,28 +65,37 @@ public class BidController {
             )
             @Valid @RequestBody PlaceBidRequest request
     ) {
-        // TODO: handle if the auctionId in /{id}/bids is different than the auctionId inside the request body
+        // TODO: handle if the auctionId in /{auctionId}/bids is different than the auctionId inside the request body
         BidResponse bidResponse = bidService.placeBid(request);
 
         // TODO: Handle XSS Vulnerability
         return ResponseEntity.status(HttpStatus.CREATED).body(bidResponse);
     }
 
-    // TODO: consider limiting the sort fields to control the filtering more
-    @GetMapping("/{id}/bids")
-    public ResponseEntity<Page<BidResponse>> getBids(@PathVariable Long id,
+    @GetMapping("/{auctionId}/bids")
+    public ResponseEntity<Page<BidResponse>> getBids(@PathVariable Long auctionId,
                                                      @RequestParam(required = false) Long bidderId,
                                                      @PageableDefault(size = 10) @SortDefault.SortDefaults({
                                                              @SortDefault(sort = "amount", direction = Sort.Direction.DESC),
                                                              @SortDefault(sort = "createdAt", direction = Sort.Direction.ASC)
                                                      }) Pageable pageable) {
-        return ResponseEntity.ok(bidService.getBids(id, bidderId, pageable));
+        return ResponseEntity.ok(bidService.getBids(auctionId, bidderId, pageable));
     }
 
-    @GetMapping("/{id}/bids/highest")
-    public ResponseEntity<BigDecimal> getHighestBid(@PathVariable Long id) {
-        BigDecimal highestBid = bidService.getHighestBid(id);
+    @GetMapping("/{auctionId}/bids/highest")
+    public ResponseEntity<BigDecimal> getHighestBid(@PathVariable Long auctionId) {
+        BigDecimal highestBid = bidService.getHighestBid(auctionId);
         return ResponseEntity.ok(highestBid);
+    }
+
+    @GetMapping("/bidder/{bidderId}/bids")
+    public ResponseEntity<Page<BidResponse>> getBidsByBidder(@PathVariable Long bidderId,
+                                                             @PageableDefault(
+                                                                     size = 10,
+                                                                     sort = "createdAt",
+                                                                     direction = Sort.Direction.ASC
+                                                             ) Pageable pageable) {
+        return ResponseEntity.ok(bidService.getBidsByBidder(bidderId, pageable));
     }
 
 }

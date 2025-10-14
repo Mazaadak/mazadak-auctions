@@ -111,4 +111,10 @@ public class BidServiceImpl implements BidService {
         return bids.map(BidMapper::toBidResponse);
     }
 
+    @Override
+    public Page<BidResponse> getBidsByBidder(Long bidderId, Pageable pageable) {
+        Page<Bid> bids = bidRepository.findByBidderId(bidderId, pageable);
+        return bids.map(BidMapper::toBidResponse);
+    }
+
 }

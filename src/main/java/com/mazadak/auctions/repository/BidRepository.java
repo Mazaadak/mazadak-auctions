@@ -14,6 +14,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     Optional<Bid> findByIdempotencyKey(String idempotencyKey);
     Page<Bid> findByAuctionId(Long auctionId, Pageable pageable);
     Page<Bid> findByAuctionIdAndBidderId(Long auctionId, Long bidderId, Pageable pageable);
-
+    Page<Bid> findByBidderId(Long bidderId, Pageable pageable);
     Long countByAuctionId(Long auctionId);
 }

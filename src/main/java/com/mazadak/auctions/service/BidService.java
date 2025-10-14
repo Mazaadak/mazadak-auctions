@@ -11,4 +11,5 @@ public interface BidService {
     BidResponse placeBid(PlaceBidRequest request);
     BigDecimal getHighestBid(Long auctionId);
     Page<BidResponse> getBids(Long id, Long bidderId, Pageable pageable);
+    Page<BidResponse> getBidsByBidder(Long bidderId, Pageable pageable);
 }
