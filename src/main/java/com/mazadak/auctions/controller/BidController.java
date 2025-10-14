@@ -6,6 +6,11 @@ import com.mazadak.auctions.service.BidService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -65,6 +70,17 @@ public class BidController {
 
         // TODO: Handle XSS Vulnerability
         return ResponseEntity.status(HttpStatus.CREATED).body(bidResponse);
+    }
+
+    // TODO: consider limiting the sort fields to control the filtering more
+    @GetMapping("/{id}/bids")
+    public ResponseEntity<Page<BidResponse>> getBids(@PathVariable Long id,
+                                                     @RequestParam(required = false) Long bidderId,
+                                                     @PageableDefault(size = 10) @SortDefault.SortDefaults({
+                                                             @SortDefault(sort = "amount", direction = Sort.Direction.DESC),
+                                                             @SortDefault(sort = "createdAt", direction = Sort.Direction.ASC)
+                                                     }) Pageable pageable) {
+        return ResponseEntity.ok(bidService.getBids(id, bidderId, pageable));
     }
 
     @GetMapping("/{id}/bids/highest")
