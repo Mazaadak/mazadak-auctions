@@ -24,7 +24,6 @@ import java.util.Optional;
 public class ValidBidPlacementValidator implements ConstraintValidator<ValidBidPlacement, PlaceBidRequest> {
 
     private final AuctionRepository auctionRepository;
-    private final BidRepository bidRepository;
 
     /**
      * Validates a {@link PlaceBidRequest} for placing a bid on an auction.
@@ -54,6 +53,7 @@ public class ValidBidPlacementValidator implements ConstraintValidator<ValidBidP
         Long auctionId = request.getAuctionId();
         if (auctionId == null) return true;
 
+        System.out.println(auctionId);
         Auction auction = auctionRepository.findById(auctionId).orElse(null);
         if (auction == null) {
             return violation(constraintValidatorContext, "Auction does not exist");

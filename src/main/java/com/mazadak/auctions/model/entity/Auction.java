@@ -46,9 +46,6 @@ public class Auction extends BaseEntity {
     @Setter(AccessLevel.NONE)
     private AuctionStatus status = AuctionStatus.SCHEDULED;
 
-    @Version
-    private Long version;
-
     public void setStatus(AuctionStatus newStatus) {
         if (!this.status.canTransitionTo(newStatus)) {
             throw new InvalidAuctionStatusTransitionException("Cannot transition auction status from " + this.status + " to " + newStatus, this.status, newStatus);

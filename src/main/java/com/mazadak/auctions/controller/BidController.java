@@ -58,6 +58,7 @@ public class BidController {
             )
             @Valid @RequestBody PlaceBidRequest request
     ) {
+        // TODO: handle if the auctionId in /{id}/bids is different than the auctionId inside the request body
         BidResponse bidResponse = bidService.placeBid(request);
 
         // TODO: Handle XSS Vulnerability
