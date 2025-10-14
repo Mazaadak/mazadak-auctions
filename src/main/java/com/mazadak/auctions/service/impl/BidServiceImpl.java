@@ -12,11 +12,15 @@ import com.mazadak.auctions.repository.AuctionRepository;
 import com.mazadak.auctions.repository.BidRepository;
 import com.mazadak.auctions.service.BidService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -84,4 +88,33 @@ public class BidServiceImpl implements BidService {
 
         return BidMapper.toBidResponse(newBid);
     }
+
+    @Override
+    public BigDecimal getHighestBid(Long auctionId) {
+        Auction auction = auctionRepository.findById(auctionId).orElseThrow(
+                () -> new ResourceNotFoundException("Auction", "auctionId", auctionId.toString())
+        );
+
+        return auction.getHighestBidPlaced();
+    }
+
+    @Override
+    public Page<BidResponse> getBids(Long id, Long bidderId, Pageable pageable) {
+        Auction auction = auctionRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Auction", "auctionId", id.toString())
+        );
+
+        Page<Bid> bids = (bidderId != null
+                ? bidRepository.findByAuctionIdAndBidderId(id, bidderId, pageable)
+                : bidRepository.findByAuctionId(id, pageable));
+
+        return bids.map(BidMapper::toBidResponse);
+    }
+
+    @Override
+    public Page<BidResponse> getBidsByBidder(Long bidderId, Pageable pageable) {
+        Page<Bid> bids = bidRepository.findByBidderId(bidderId, pageable);
+        return bids.map(BidMapper::toBidResponse);
+    }
+
 }
