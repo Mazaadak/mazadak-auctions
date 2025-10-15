@@ -2,7 +2,7 @@ package com.mazadak.auctions.service.impl;
 
 import com.mazadak.auctions.dto.request.PlaceBidRequest;
 import com.mazadak.auctions.dto.response.BidResponse;
-import com.mazadak.auctions.exception.InvalidBIdAmountException;
+import com.mazadak.auctions.exception.InvalidBidException;
 import com.mazadak.auctions.exception.ResourceNotFoundException;
 import com.mazadak.auctions.mapper.BidMapper;
 import com.mazadak.auctions.model.entity.Auction;
@@ -14,13 +14,14 @@ import com.mazadak.auctions.service.BidService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -29,50 +30,30 @@ public class BidServiceImpl implements BidService {
     private final AuctionRepository auctionRepository;
     private final BidRepository bidRepository;
 
-    /**
-     * Places a bid for the given auction.
-     *
-     * <p>Behavior:
-     * <ol>
-     *   <li>If an idempotency key is provided and a bid with that key already exists, returns the existing bid.</li>
-     *   <li>Loads the auction with a lock (via {@code findByIdForUpdate}) and throws {@link ResourceNotFoundException}
-     *       if the auction does not exist.</li>
-     *   <li>If the auction is in {@link AuctionStatus#STARTED} and this is the first bid, transitions the auction to
-     *       {@link AuctionStatus#ACTIVE}.</li>
-     *   <li>Validates that the requested bid amount is at least the current highest bid (or starting price) plus the
-     *       auction's bid increment; throws {@link IllegalArgumentException} if the amount is too low.</li>
-     *   <li>Persists the new {@link Bid} and updates the auction's highest bid.</li>
-     * </ol>
-     *
-     * @param request the {@link PlaceBidRequest} containing auctionId, bidderId, amount and optional idempotencyKey
-     * @return a {@link BidResponse} representing the created or existing bid
-     * @throws ResourceNotFoundException if the auction with the given id cannot be found
-     * @throws IllegalArgumentException if the bid amount is below the minimum allowed
-     */
     @Transactional
     @Override
-    public BidResponse placeBid(PlaceBidRequest request) {
-        String idemKey = request.getIdempotencyKey();
+    public BidResponse placeBid(PlaceBidRequest request, Long auctionId) {
+        String idempotencyKey = request.getIdempotencyKey();
 
-        if (idemKey != null) {
-            Optional<Bid> existingBid = bidRepository.findByIdempotencyKey(idemKey);
+        if (idempotencyKey != null) {
+            Optional<Bid> existingBid = bidRepository.findByIdempotencyKey(idempotencyKey);
             if (existingBid.isPresent()) {
                 return BidMapper.toBidResponse(existingBid.get());
             }
         }
 
+        // This locks the auction record, other threads are allowed to read only.
         Auction auction = auctionRepository.findByIdForUpdate(request.getAuctionId()).orElseThrow(
                 () -> new ResourceNotFoundException("Auction", "Id", request.getAuctionId().toString())
         );
 
+        validateAuctionStatus(auction);
+        validateSellerIsNotBidder(auction, request.getBidderId());
+        validateAuctionTimeWindow(auction);
+        validateMinimumBid(auction, request.getAmount());
+
         if (auction.getStatus().equals(AuctionStatus.STARTED) && bidRepository.countByAuctionId(auction.getId()) == 0L) {
             auction.setStatus(AuctionStatus.ACTIVE);
-        }
-
-        BigDecimal currentHighestBid = Optional.ofNullable(auction.getHighestBidPlaced()).orElse(auction.getStartingPrice());
-        BigDecimal minAllowedBid = currentHighestBid.add(auction.getBidIncrement());
-        if (request.getAmount().compareTo(minAllowedBid) < 0) {
-            throw new InvalidBIdAmountException(request.getAmount(), minAllowedBid);
         }
 
         Bid newBid = new Bid(
@@ -87,6 +68,37 @@ public class BidServiceImpl implements BidService {
         auctionRepository.save(auction);
 
         return BidMapper.toBidResponse(newBid);
+    }
+
+    private void validateAuctionStatus(Auction auction) {
+        AuctionStatus status = auction.getStatus();
+        if (!(status.equals(AuctionStatus.STARTED) || status.equals(AuctionStatus.ACTIVE))) {
+            throw new InvalidBidException("Cannot place bid: auction has not started. Auction Id: " + auction.getId());
+        }
+    }
+
+    private void validateSellerIsNotBidder(Auction auction, Long bidderId) {
+        if (Objects.equals(bidderId, auction.getSellerId())) {
+            throw new InvalidBidException("Seller cannot bid on their own auction");
+        }
+    }
+
+    private void validateAuctionTimeWindow(Auction auction) {
+        Instant now = Instant.now();
+        Instant startTime = auction.getStartTime().toInstant(ZoneOffset.UTC);
+        Instant endTime = auction.getEndTime().toInstant(ZoneOffset.UTC);
+        if (now.isBefore(startTime) || now.isAfter(endTime)) {
+            throw new InvalidBidException(String.format("Auction is not accepting bids at this time. Valid window: %s - %s (UTC)",
+                    startTime, endTime));
+        }
+    }
+
+    private void validateMinimumBid(Auction auction, BigDecimal amount) {
+        BigDecimal currentHighestBid = Optional.ofNullable(auction.getHighestBidPlaced()).orElse(auction.getStartingPrice());
+        BigDecimal minAllowedBid = currentHighestBid.add(auction.getBidIncrement());
+        if (amount.compareTo(minAllowedBid) < 0) {
+            throw new InvalidBidException(amount, minAllowedBid);
+        }
     }
 
     @Override

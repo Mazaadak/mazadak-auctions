@@ -5,6 +5,7 @@ import com.mazadak.auctions.dto.response.BidResponse;
 import com.mazadak.auctions.service.BidService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,10 +58,10 @@ public class BidController {
     @PostMapping("/{auctionId}/bids")
     public ResponseEntity<BidResponse> placeBid(
             @PathVariable Long auctionId,
-            @Valid @RequestBody PlaceBidRequest request
+            @Valid @NotNull @RequestBody PlaceBidRequest request
     ) {
         // TODO: handle if the auctionId in /{auctionId}/bids is different than the auctionId inside the request body
-        BidResponse bidResponse = bidService.placeBid(request);
+        BidResponse bidResponse = bidService.placeBid(request, auctionId);
 
         // TODO: Handle XSS Vulnerability
         return ResponseEntity.status(HttpStatus.CREATED).body(bidResponse);
