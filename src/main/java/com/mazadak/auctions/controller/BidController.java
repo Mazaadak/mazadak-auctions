@@ -60,7 +60,6 @@ public class BidController {
             @PathVariable Long auctionId,
             @Valid @NotNull @RequestBody PlaceBidRequest request
     ) {
-        // TODO: handle if the auctionId in /{auctionId}/bids is different than the auctionId inside the request body
         BidResponse bidResponse = bidService.placeBid(request, auctionId);
 
         // TODO: Handle XSS Vulnerability
@@ -110,7 +109,6 @@ public class BidController {
         BigDecimal highestBid = bidService.getHighestBid(auctionId);
         return ResponseEntity.ok(highestBid);
     }
-
 
     @Operation(
             summary = "Get bids by bidder",

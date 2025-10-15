@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 /*
-* CREATE TABLE bids (
+CREATE TABLE bids (
   bid_id BIGINT AUTO_INCREMENT PRIMARY KEY,
   auction_id BIGINT NOT NULL,
   bidder_id BIGINT NOT NULL,
@@ -18,8 +18,7 @@ import java.util.UUID;
   INDEX idx_auction_amount (auction_id, amount DESC, created_at ASC),
   FOREIGN KEY (auction_id) REFERENCES auctions(auction_id)
 );
-
-* */
+*/
 
 
 @Entity
