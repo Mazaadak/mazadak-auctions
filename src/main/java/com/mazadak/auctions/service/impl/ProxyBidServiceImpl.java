@@ -2,6 +2,7 @@ package com.mazadak.auctions.service.impl;
 
 
 import com.mazadak.auctions.dto.request.ProxyBidRequest;
+import com.mazadak.auctions.dto.response.ProxyBidResponse;
 import com.mazadak.auctions.exception.ResourceNotFoundException;
 import com.mazadak.auctions.mapper.ProxyBidMapper;
 import com.mazadak.auctions.model.entity.Auction;
@@ -48,5 +49,14 @@ public class ProxyBidServiceImpl implements ProxyBidService {
         proxyBidRepository.save(proxyBid);
 
         return new UpsertResult(ProxyBidMapper.toResponseDto(proxyBid), true);
+    }
+
+    @Override
+    public ProxyBidResponse getProxyBid(Long auctionId, Long bidderId) {
+        ProxyBid proxyBid = proxyBidRepository.findByAuctionIdAndBidderId(auctionId, bidderId).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Proxy Bid not found for auction id = %d and bidder id = %d", auctionId, bidderId))
+        );
+
+        return ProxyBidMapper.toResponseDto(proxyBid);
     }
 }

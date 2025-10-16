@@ -31,7 +31,6 @@ import java.net.URI;
 )
 @AllArgsConstructor
 @Validated
-// TODO: Replace OpenAPI ApiResponse with Problem Details
 public class ProxyBidController {
 
     private final ProxyBidService proxyBidService;
@@ -45,6 +44,12 @@ public class ProxyBidController {
             @ApiResponse(
                     responseCode = "201",
                     description = "Proxy bid created",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ProxyBidResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Proxy bid updated",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ProxyBidResponse.class))
             ),
@@ -62,10 +67,14 @@ public class ProxyBidController {
         HttpStatus status = (result.created() ? HttpStatus.CREATED : HttpStatus.OK);
         URI location = URI.create(String.format("auctions/%d/proxy-bids/%d", auctionId, bidderId));
 
-        // TODO: Handle XSS Vulnerability
         return ResponseEntity.status(status)
                 .location(location)
                 .body(result.response());
     }
 
+    @GetMapping("/{bidderId}")
+    public ResponseEntity<ProxyBidResponse> getProxyBid(@PathVariable Long auctionId,
+                                                        @PathVariable Long bidderId) {
+        return ResponseEntity.ok(proxyBidService.getProxyBid(auctionId, bidderId));
+    }
 }
