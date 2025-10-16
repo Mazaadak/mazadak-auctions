@@ -5,22 +5,22 @@ import com.mazadak.auctions.dto.response.ProxyBidResponse;
 import com.mazadak.auctions.model.entity.ProxyBid;
 
 public class ProxyBidMapper {
-    public static ProxyBid toEntity(ProxyBidRequest dto) {
+    public static ProxyBid toEntity(ProxyBidRequest dto, Long auctionId, Long bidderId) {
         return new ProxyBid(
-                dto.getAuctionId(),
-                dto.getBidderId(),
-                dto.getMaxAmount(),
-                dto.getIdempotencyKey()
+                auctionId,
+                bidderId,
+                dto.getMaxAmount()
         );
     }
 
-    public static ProxyBidResponse toBidResponse(ProxyBid proxyBid) {
+    public static ProxyBidResponse toResponseDto(ProxyBid proxyBid) {
         return new ProxyBidResponse(
                 proxyBid.getId(),
                 proxyBid.getAuctionId(),
                 proxyBid.getBidderId(),
                 proxyBid.getMaxAmount(),
-                proxyBid.getIdempotencyKey()
+                proxyBid.getCreatedAt(),
+                proxyBid.getUpdatedAt()
         );
     }
 

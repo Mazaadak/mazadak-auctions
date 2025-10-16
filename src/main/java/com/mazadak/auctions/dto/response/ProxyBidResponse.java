@@ -5,6 +5,8 @@ import lombok.Value;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDateTime;
 
 /**
  * DTO for {@link com.mazadak.auctions.model.entity.ProxyBid}
@@ -28,6 +30,9 @@ public class ProxyBidResponse implements Serializable {
     @Schema(description = "Bid amount", example = "500.00")
     BigDecimal maxAmount;
 
-    @Schema(description = "Idempotency key used when placing the bid", example = "a1b2c3d4-e5f6-7g8h-9i0j")
-    String idempotencyKey;
+    @Schema(description = "Creation time for proxy bid")
+    Instant createdAt;
+
+    @Schema(description = "Last update time for proxy bid")
+    Instant updatedAt;
 }

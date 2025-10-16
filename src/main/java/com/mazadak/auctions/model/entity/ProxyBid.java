@@ -9,6 +9,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 
+
 /*
 CREATE TABLE proxy_bids (
   proxy_bid_id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -17,16 +18,13 @@ CREATE TABLE proxy_bids (
   max_amount DECIMAL(18,2) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  idempotency_key VARCHAR(255),
   CONSTRAINT uq_proxy_bidder_auction UNIQUE (auction_id, bidder_id),
-  CONSTRAINT uq_proxy_idempotency UNIQUE (idempotency_key),
   FOREIGN KEY (auction_id) REFERENCES auctions(auction_id)
 );
 */
-
 @Entity
 @Table(name = "proxy_bids", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"auction_id, bidder_id"})
+        @UniqueConstraint(columnNames = {"auction_id", "bidder_id"})
 })
 @Getter @Setter @ToString
 @AllArgsConstructor @NoArgsConstructor
@@ -39,7 +37,4 @@ public class ProxyBid extends BaseEntity {
     private Long bidderId;
 
     private BigDecimal maxAmount;
-
-    @Column(unique = true)
-    private String idempotencyKey;
 }
