@@ -108,8 +108,8 @@ public class BidController {
             @ApiResponse(responseCode = "404", description = "Auction not found", content = @Content)
     })
     @GetMapping("/{auctionId}/bids/highest")
-    public ResponseEntity<BigDecimal> getHighestBid(@PathVariable Long auctionId) {
-        BigDecimal highestBid = bidService.getHighestBid(auctionId);
+    public ResponseEntity<BidResponse> getHighestBid(@PathVariable Long auctionId) {
+        BidResponse highestBid = bidService.getHighestBid(auctionId);
         return ResponseEntity.ok(highestBid);
     }
 

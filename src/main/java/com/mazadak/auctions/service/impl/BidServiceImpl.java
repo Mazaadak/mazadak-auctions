@@ -11,6 +11,7 @@ import com.mazadak.auctions.model.enumeration.AuctionStatus;
 import com.mazadak.auctions.repository.AuctionRepository;
 import com.mazadak.auctions.repository.BidRepository;
 import com.mazadak.auctions.service.BidService;
+import com.mazadak.auctions.service.ProxyBidService;
 import com.mazadak.auctions.service.support.BidValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,7 @@ public class BidServiceImpl implements BidService {
     private final AuctionRepository auctionRepository;
     private final BidRepository bidRepository;
     private final BidValidator bidValidator;
+    private final ProxyBidService proxyBidService;
 
     @Transactional
     @Override
@@ -56,19 +58,19 @@ public class BidServiceImpl implements BidService {
 
         Bid newBid = BidMapper.toEntity(request, auctionId, idempotencyKey);
         bidRepository.save(newBid);
-        auction.setHighestBidPlaced(newBid.getAmount());
+        auction.setHighestBidPlaced(newBid);
         auctionRepository.save(auction);
 
         return BidMapper.toResponseDto(newBid);
     }
 
     @Override
-    public BigDecimal getHighestBid(Long auctionId) {
+    public BidResponse getHighestBid(Long auctionId) {
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(
                 () -> new ResourceNotFoundException("Auction", "auctionId", auctionId.toString())
         );
 
-        return auction.getHighestBidPlaced();
+        return BidMapper.toResponseDto(auction.getHighestBidPlaced());
     }
 
     @Override
