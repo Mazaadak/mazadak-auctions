@@ -30,7 +30,9 @@ public class Auction extends BaseEntity {
 
     private BigDecimal reservePrice = startingPrice;
 
-    private BigDecimal highestBidPlaced;
+    @OneToOne
+    @JoinColumn(name = "highest_bid_placed_id")
+    private Bid highestBidPlaced;
 
     @Column(nullable = false)
     private BigDecimal bidIncrement;

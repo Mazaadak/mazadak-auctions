@@ -1,5 +1,6 @@
 package com.mazadak.auctions.dto.response;
 
+import com.mazadak.auctions.model.entity.Bid;
 import com.mazadak.auctions.model.enumeration.AuctionStatus;
 
 import java.io.Serializable;
@@ -16,7 +17,7 @@ public record AuctionResponse(
         String title,
         BigDecimal startingPrice,
         BigDecimal reservePrice,
-        BigDecimal highestBidPlaced,
+        Bid highestBidPlaced,
         BigDecimal bidIncrement,
         LocalDateTime startTime,
         LocalDateTime endTime,
