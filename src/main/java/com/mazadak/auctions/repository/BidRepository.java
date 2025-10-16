@@ -15,6 +15,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     Page<Bid> findByAuctionId(Long auctionId, Pageable pageable);
     Page<Bid> findByAuctionIdAndBidderId(Long auctionId, Long bidderId, Pageable pageable);
     Page<Bid> findByBidderId(Long bidderId, Pageable pageable);
-    List<Bid> findAllByAuctionId(Long auctionId);
     Long countByAuctionId(Long auctionId);
+    List<Bid> findByAuctionIdOrderByAmountDescCreatedAtAsc(Long auctionId);
 }
