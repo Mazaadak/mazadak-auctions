@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 
+// TODO: Change all Ids to UUID, and Change the examples in OpenAPI documentation
 @Getter
 @Setter
 @MappedSuperclass

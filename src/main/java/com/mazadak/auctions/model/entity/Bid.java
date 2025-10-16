@@ -37,7 +37,6 @@ public class Bid extends BaseEntity {
 
     private BigDecimal amount;
 
-    // TODO: Make a final decision to keep this nullable or enforce not nullable (this relies on how proxy bids are handled)
     @Column(unique = true)
     private String idempotencyKey;
 }

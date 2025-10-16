@@ -17,12 +17,7 @@ import java.math.BigDecimal;
         description = "Schema to Hold Place Bid Request Information"
 )
 @Value
-// TODO: Change example when changing Id to UUID
 public class PlaceBidRequest implements Serializable {
-    @Schema(description = "Identifier of the auction the bid is placed on", example = "123", required = true)
-    @NotNull(message = "A bid must be associated with an auction")
-    Long auctionId;
-
     @Schema(description = "Identifier of the bidder placing the bid", example = "456", required = true)
     @NotNull(message = "A bid must be associated with a bidder")
     Long bidderId;
@@ -31,7 +26,4 @@ public class PlaceBidRequest implements Serializable {
     @NotNull(message = "A bid must have an amount")
     @Positive(message = "Bid amount must be positive")
     BigDecimal amount;
-
-    @Schema(description = "Idempotency key to prevent duplicate bids. Optional.", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
-    String idempotencyKey;
 }

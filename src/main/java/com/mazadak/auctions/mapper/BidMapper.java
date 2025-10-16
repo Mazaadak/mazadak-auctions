@@ -5,16 +5,16 @@ import com.mazadak.auctions.dto.response.BidResponse;
 import com.mazadak.auctions.model.entity.Bid;
 
 public class BidMapper {
-    public static Bid toEntity(PlaceBidRequest dto) {
+    public static Bid toEntity(PlaceBidRequest dto, Long auctionId, String idempotencyKey) {
         return new Bid(
-                dto.getAuctionId(),
+                auctionId,
                 dto.getBidderId(),
                 dto.getAmount(),
-                dto.getIdempotencyKey()
+                idempotencyKey
         );
     }
 
-    public static BidResponse toBidResponse(Bid bid) {
+    public static BidResponse toResponseDto(Bid bid) {
         return new BidResponse(
                 bid.getId(),
                 bid.getAuctionId(),

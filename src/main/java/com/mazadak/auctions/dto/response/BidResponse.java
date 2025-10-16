@@ -16,7 +16,6 @@ import java.time.Instant;
         description = "Bid details returned by the API"
 )
 @Value
-// TODO: Change examples when changing Ids to UUID
 public class BidResponse implements Serializable {
 
     @Schema(description = "Unique identifier of the bid", example = "123")

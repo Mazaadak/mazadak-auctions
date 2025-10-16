@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,9 +59,11 @@ public class BidController {
     @PostMapping("/{auctionId}/bids")
     public ResponseEntity<BidResponse> placeBid(
             @PathVariable Long auctionId,
+            // TODO: don't forget to handle MissingRequestHeaderException() and return problem details if the key is missing
+            @RequestHeader(value = "Idempotency-Key", required = true) String idempotencyKey,
             @Valid @NotNull @RequestBody PlaceBidRequest request
     ) {
-        BidResponse bidResponse = bidService.placeBid(request, auctionId);
+        BidResponse bidResponse = bidService.placeBid(request, auctionId, idempotencyKey);
 
         // TODO: Handle XSS Vulnerability
         return ResponseEntity.status(HttpStatus.CREATED).body(bidResponse);

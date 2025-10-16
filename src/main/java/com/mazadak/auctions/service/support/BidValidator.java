@@ -1,0 +1,47 @@
+package com.mazadak.auctions.service.support;
+
+import com.mazadak.auctions.exception.InvalidBidException;
+import com.mazadak.auctions.model.entity.Auction;
+import com.mazadak.auctions.model.enumeration.AuctionStatus;
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.Objects;
+import java.util.Optional;
+
+@Component
+public class BidValidator {
+    public void validateAuctionStatus(Auction auction) {
+        AuctionStatus status = auction.getStatus();
+        if (!(status.equals(AuctionStatus.STARTED) || status.equals(AuctionStatus.ACTIVE))) {
+            throw new InvalidBidException("Cannot place bid: auction has not started. Auction Id: " + auction.getId());
+        }
+    }
+
+    public void validateSellerIsNotBidder(Auction auction, Long bidderId) {
+        if (Objects.equals(bidderId, auction.getSellerId())) {
+            throw new InvalidBidException("Seller cannot bid on their own auction");
+        }
+    }
+
+    public void validateAuctionTimeWindow(Auction auction) {
+        Instant now = Instant.now();
+        Instant startTime = auction.getStartTime().toInstant(ZoneOffset.UTC);
+        Instant endTime = auction.getEndTime().toInstant(ZoneOffset.UTC);
+        if (now.isBefore(startTime) || now.isAfter(endTime)) {
+            throw new InvalidBidException(String.format("Auction is not accepting bids at this time. Valid window: %s - %s (UTC)",
+                    startTime, endTime));
+        }
+    }
+
+    public void validateMinimumBid(Auction auction, BigDecimal amount) {
+        BigDecimal currentHighestBid = Optional.ofNullable(auction.getHighestBidPlaced()).orElse(auction.getStartingPrice());
+        BigDecimal minAllowedBid = currentHighestBid.add(auction.getBidIncrement());
+        if (amount.compareTo(minAllowedBid) < 0) {
+            throw new InvalidBidException(amount, minAllowedBid);
+        }
+    }
+
+}
