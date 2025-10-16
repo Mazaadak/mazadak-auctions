@@ -77,4 +77,12 @@ public class ProxyBidController {
                                                         @PathVariable Long bidderId) {
         return ResponseEntity.ok(proxyBidService.getProxyBid(auctionId, bidderId));
     }
+
+    @DeleteMapping("/{bidderId}")
+    public ResponseEntity<Void> deleteProxyBid(@PathVariable Long auctionId,
+                                               @PathVariable Long bidderId) {
+        proxyBidService.deleteProxyBid(auctionId, bidderId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface ProxyBidRepository extends JpaRepository<ProxyBid, Long> {
     Optional<ProxyBid> findByAuctionIdAndBidderId(Long auctionId, Long BidderId);
+    void deleteByAuctionIdAndBidderId(Long auctionId, Long bidderId);
 }

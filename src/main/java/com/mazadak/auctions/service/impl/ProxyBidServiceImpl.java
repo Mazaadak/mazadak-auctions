@@ -59,4 +59,13 @@ public class ProxyBidServiceImpl implements ProxyBidService {
 
         return ProxyBidMapper.toResponseDto(proxyBid);
     }
+
+    @Override
+    public void deleteProxyBid(Long auctionId, Long bidderId) {
+        ProxyBid proxyBid = proxyBidRepository.findByAuctionIdAndBidderId(auctionId, bidderId).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Proxy Bid not found for auction id = %d and bidder id = %d", auctionId, bidderId))
+        );
+
+        proxyBidRepository.deleteByAuctionIdAndBidderId(auctionId, bidderId);
+    }
 }

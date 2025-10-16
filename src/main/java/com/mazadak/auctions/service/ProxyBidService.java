@@ -8,4 +8,6 @@ public interface ProxyBidService {
     UpsertResult upsertProxyBid(ProxyBidRequest request, Long auctionId, Long bidderId);
 
     ProxyBidResponse getProxyBid(Long auctionId, Long bidderId);
+
+    void deleteProxyBid(Long auctionId, Long bidderId);
 }
