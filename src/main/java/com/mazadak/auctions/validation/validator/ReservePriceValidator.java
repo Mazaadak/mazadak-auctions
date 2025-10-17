@@ -1,6 +1,5 @@
 package com.mazadak.auctions.validation.validator;
 
-import com.mazadak.auctions.dto.request.UpdateAuctionRequest;
 import com.mazadak.auctions.validation.annotation.ValidReservePrice;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

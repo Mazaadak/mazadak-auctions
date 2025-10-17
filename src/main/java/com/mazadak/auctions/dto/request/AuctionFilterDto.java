@@ -4,6 +4,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record AuctionFilterDto(
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startsBefore,
@@ -12,6 +13,6 @@ public record AuctionFilterDto(
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endsAfter,
         BigDecimal minHighestBid,
         BigDecimal maxHighestBid,
-        Long sellerId,
+        UUID sellerId,
         String title) {
 }

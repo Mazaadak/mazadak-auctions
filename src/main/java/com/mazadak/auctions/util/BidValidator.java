@@ -1,7 +1,8 @@
-package com.mazadak.auctions.service.support;
+package com.mazadak.auctions.util;
 
 import com.mazadak.auctions.exception.InvalidBidException;
 import com.mazadak.auctions.model.entity.Auction;
+import com.mazadak.auctions.model.entity.Bid;
 import com.mazadak.auctions.model.enumeration.AuctionStatus;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +11,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 public class BidValidator {
@@ -20,7 +22,7 @@ public class BidValidator {
         }
     }
 
-    public void validateSellerIsNotBidder(Auction auction, Long bidderId) {
+    public void validateSellerIsNotBidder(Auction auction, UUID bidderId) {
         if (Objects.equals(bidderId, auction.getSellerId())) {
             throw new InvalidBidException("Seller cannot bid on their own auction");
         }
@@ -37,11 +39,12 @@ public class BidValidator {
     }
 
     public void validateMinimumBid(Auction auction, BigDecimal amount) {
-        BigDecimal currentHighestBid = Optional.ofNullable(auction.getHighestBidPlaced()).orElse(auction.getStartingPrice());
+        BigDecimal currentHighestBid = Optional.ofNullable(auction.getHighestBidPlaced())
+                .map(Bid::getAmount)
+                .orElse(auction.getStartingPrice());
         BigDecimal minAllowedBid = currentHighestBid.add(auction.getBidIncrement());
         if (amount.compareTo(minAllowedBid) < 0) {
             throw new InvalidBidException(amount, minAllowedBid);
         }
     }
-
 }

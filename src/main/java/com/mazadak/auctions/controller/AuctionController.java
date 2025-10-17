@@ -7,7 +7,6 @@ import com.mazadak.auctions.dto.response.AuctionResponse;
 import com.mazadak.auctions.service.AuctionService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -20,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(
@@ -28,13 +28,13 @@ import java.util.List;
 )
 @Validated
 @AllArgsConstructor
-@CrossOrigin("*")
+@CrossOrigin("*") // TODO: remove
 public class AuctionController {
     private final AuctionService auctionService;
     private final Logger logger = LoggerFactory.getLogger(AuctionController.class);
 
     @GetMapping("{id}")
-    ResponseEntity<AuctionResponse> findAuctionById(@PathVariable Long id) {
+    ResponseEntity<AuctionResponse> findAuctionById(@PathVariable UUID id) {
         return ResponseEntity.ok(auctionService.findAuctionById(id));
     }
 
@@ -48,14 +48,14 @@ public class AuctionController {
 
     // TODO: authorization
     @PutMapping("{id}")
-    ResponseEntity<AuctionResponse> updateAuction(@PathVariable Long id,
+    ResponseEntity<AuctionResponse> updateAuction(@PathVariable UUID id,
                                                   @Valid @RequestBody UpdateAuctionRequest request) {
         return ResponseEntity.ok(auctionService.updateAuction(id, request));
     }
 
     // TODO: authorization
     @DeleteMapping("{id}")
-    ResponseEntity<Void> deleteAuction(@PathVariable Long id) {
+    ResponseEntity<Void> deleteAuction(@PathVariable UUID id) {
         auctionService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
@@ -68,36 +68,36 @@ public class AuctionController {
 
     // TODO: authorization
     @PostMapping("{id}/cancel")
-    ResponseEntity<AuctionResponse> cancelAuction(@PathVariable Long id) {
+    ResponseEntity<AuctionResponse> cancelAuction(@PathVariable UUID id) {
         return ResponseEntity.ok(auctionService.cancelAuction(id));
     }
 
     // TODO: authorization
     @PostMapping("{id}/pause")
-    ResponseEntity<AuctionResponse> pauseAuction(@PathVariable Long id) {
+    ResponseEntity<AuctionResponse> pauseAuction(@PathVariable UUID id) {
         return ResponseEntity.ok(auctionService.pauseAuction(id));
     }
 
     // TODO: authorization
     @PostMapping("{id}/resume")
-    ResponseEntity<AuctionResponse> resumeAuction(@PathVariable Long id) {
+    ResponseEntity<AuctionResponse> resumeAuction(@PathVariable UUID id) {
         return ResponseEntity.ok(auctionService.resumeAuction(id));
     }
 
     @PostMapping("{id}/watch")
-    ResponseEntity<Void> watchAuction(@PathVariable Long id, @RequestHeader("X-User-Id") Long userId) {
+    ResponseEntity<Void> watchAuction(@PathVariable UUID id, @RequestHeader("X-User-Id") UUID userId) {
         auctionService.addWatcher(id, userId);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("{id}/unwatch")
-    ResponseEntity<Void> unwatchAuction(@PathVariable Long id, @RequestHeader("X-User-Id") Long userId) {
+    ResponseEntity<Void> unwatchAuction(@PathVariable UUID id, @RequestHeader("X-User-Id") UUID userId) {
         auctionService.removeWatcher(id, userId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("{id}/watchers")
-    ResponseEntity<List<Long>> getWatchers(@PathVariable Long id) {
+    ResponseEntity<List<Long>> getWatchers(@PathVariable UUID id) {
         return ResponseEntity.ok(auctionService.getWatcherIds(id));
     }
 }

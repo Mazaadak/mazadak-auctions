@@ -45,7 +45,7 @@ public class AuctionMapper {
                 auction.getTitle(),
                 auction.getStartingPrice(),
                 auction.getReservePrice(),
-                auction.getHighestBidPlaced(),
+                auction.getHighestBidPlaced() == null ? null : BidMapper.toResponseDto(auction.getHighestBidPlaced()),
                 auction.getBidIncrement(),
                 auction.getStartTime(),
                 auction.getEndTime(),

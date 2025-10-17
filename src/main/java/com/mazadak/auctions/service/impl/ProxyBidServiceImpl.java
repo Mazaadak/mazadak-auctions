@@ -10,13 +10,14 @@ import com.mazadak.auctions.model.entity.ProxyBid;
 import com.mazadak.auctions.repository.AuctionRepository;
 import com.mazadak.auctions.repository.ProxyBidRepository;
 import com.mazadak.auctions.service.ProxyBidService;
-import com.mazadak.auctions.service.support.BidValidator;
-import com.mazadak.auctions.service.support.UpsertResult;
+import com.mazadak.auctions.util.BidValidator;
+import com.mazadak.auctions.util.UpsertResult;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -28,7 +29,7 @@ public class ProxyBidServiceImpl implements ProxyBidService {
 
     @Override
     @Transactional
-    public UpsertResult upsertProxyBid(ProxyBidRequest request, Long auctionId, Long bidderId) {
+    public UpsertResult upsertProxyBid(ProxyBidRequest request, UUID auctionId, UUID bidderId) {
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(
                 () -> new ResourceNotFoundException("Auction", "Id", auctionId.toString())
         );
@@ -52,18 +53,18 @@ public class ProxyBidServiceImpl implements ProxyBidService {
     }
 
     @Override
-    public ProxyBidResponse getProxyBid(Long auctionId, Long bidderId) {
+    public ProxyBidResponse getProxyBid(UUID auctionId, UUID bidderId) {
         ProxyBid proxyBid = proxyBidRepository.findByAuctionIdAndBidderId(auctionId, bidderId).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Proxy Bid not found for auction id = %d and bidder id = %d", auctionId, bidderId))
+                () -> new ResourceNotFoundException(String.format("Proxy Bid not found for auction id = %s and bidder id = %s", auctionId.toString(), bidderId.toString()))
         );
 
         return ProxyBidMapper.toResponseDto(proxyBid);
     }
 
     @Override
-    public void deleteProxyBid(Long auctionId, Long bidderId) {
+    public void deleteProxyBid(UUID auctionId, UUID bidderId) {
         ProxyBid proxyBid = proxyBidRepository.findByAuctionIdAndBidderId(auctionId, bidderId).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Proxy Bid not found for auction id = %d and bidder id = %d", auctionId, bidderId))
+                () -> new ResourceNotFoundException(String.format("Proxy Bid not found for auction id = %s and bidder id = %s", auctionId.toString(), bidderId.toString()))
         );
 
         proxyBidRepository.deleteByAuctionIdAndBidderId(auctionId, bidderId);

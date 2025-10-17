@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * DTO for {@link com.mazadak.auctions.model.entity.ProxyBid}
@@ -18,14 +19,14 @@ import java.time.LocalDateTime;
 @Value
 public class ProxyBidResponse implements Serializable {
 
-    @Schema(description = "Unique identifier of the proxy bid", example = "123")
-    Long id;
+    @Schema(description = "Unique identifier of the proxy bid", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    UUID id;
 
-    @Schema(description = "Identifier of the auction this proxy bid belongs to", example = "45")
-    Long auctionId;
+    @Schema(description = "Identifier of the auction this proxy bid belongs to", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    UUID auctionId;
 
-    @Schema(description = "Identifier of the user who placed the proxy bid", example = "789")
-    Long bidderId;
+    @Schema(description = "Identifier of the user who placed the proxy bid", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    UUID bidderId;
 
     @Schema(description = "Bid amount", example = "500.00")
     BigDecimal maxAmount;

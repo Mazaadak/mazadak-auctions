@@ -6,6 +6,7 @@ import lombok.Value;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 
 /**
@@ -18,14 +19,14 @@ import java.time.Instant;
 @Value
 public class BidResponse implements Serializable {
 
-    @Schema(description = "Unique identifier of the bid", example = "123")
-    Long id;
+    @Schema(description = "Unique identifier of the bid", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    UUID id;
 
-    @Schema(description = "Identifier of the auction this bid belongs to", example = "45")
-    Long auctionId;
+    @Schema(description = "Identifier of the auction this bid belongs to", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    UUID auctionId;
 
-    @Schema(description = "Identifier of the user who placed the bid", example = "789")
-    Long bidderId;
+    @Schema(description = "Identifier of the user who placed the bid", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    UUID bidderId;
 
     @Schema(description = "Bid amount", example = "100.00")
     BigDecimal amount;

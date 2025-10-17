@@ -1,10 +1,9 @@
 package com.mazadak.auctions.controller;
 
 import com.mazadak.auctions.dto.request.ProxyBidRequest;
-import com.mazadak.auctions.dto.response.BidResponse;
 import com.mazadak.auctions.dto.response.ProxyBidResponse;
 import com.mazadak.auctions.service.ProxyBidService;
-import com.mazadak.auctions.service.support.UpsertResult;
+import com.mazadak.auctions.util.UpsertResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,7 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import org.apache.coyote.Request;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.UUID;
 
 @Tag(name = "Proxy bids", description = "Operations to related to proxy bids")
 @RestController
@@ -31,6 +30,7 @@ import java.net.URI;
 )
 @AllArgsConstructor
 @Validated
+@CrossOrigin("*") // TODO: remove
 public class ProxyBidController {
 
     private final ProxyBidService proxyBidService;
@@ -58,14 +58,14 @@ public class ProxyBidController {
     })
     @PutMapping("/{bidderId}")
     public ResponseEntity<ProxyBidResponse> upsertProxyBid(
-            @PathVariable Long auctionId,
-            @PathVariable Long bidderId,
+            @PathVariable UUID auctionId,
+            @PathVariable UUID bidderId,
             @Valid @NotNull @RequestBody ProxyBidRequest request
     ) {
 
         UpsertResult result = proxyBidService.upsertProxyBid(request, auctionId, bidderId);
         HttpStatus status = (result.created() ? HttpStatus.CREATED : HttpStatus.OK);
-        URI location = URI.create(String.format("auctions/%d/proxy-bids/%d", auctionId, bidderId));
+        URI location = URI.create(String.format("auctions/%s/proxy-bids/%s", auctionId.toString(), bidderId.toString()));
 
         return ResponseEntity.status(status)
                 .location(location)
@@ -73,14 +73,14 @@ public class ProxyBidController {
     }
 
     @GetMapping("/{bidderId}")
-    public ResponseEntity<ProxyBidResponse> getProxyBid(@PathVariable Long auctionId,
-                                                        @PathVariable Long bidderId) {
+    public ResponseEntity<ProxyBidResponse> getProxyBid(@PathVariable UUID auctionId,
+                                                        @PathVariable UUID bidderId) {
         return ResponseEntity.ok(proxyBidService.getProxyBid(auctionId, bidderId));
     }
 
     @DeleteMapping("/{bidderId}")
-    public ResponseEntity<Void> deleteProxyBid(@PathVariable Long auctionId,
-                                               @PathVariable Long bidderId) {
+    public ResponseEntity<Void> deleteProxyBid(@PathVariable UUID auctionId,
+                                               @PathVariable UUID bidderId) {
         proxyBidService.deleteProxyBid(auctionId, bidderId);
         return ResponseEntity.noContent().build();
     }
