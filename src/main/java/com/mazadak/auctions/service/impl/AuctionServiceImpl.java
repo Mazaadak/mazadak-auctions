@@ -15,17 +15,15 @@ import com.mazadak.auctions.repository.AuctionWatchRepository;
 import com.mazadak.auctions.repository.specification.AuctionSpecifications;
 import com.mazadak.auctions.service.AuctionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.repository.core.support.RepositoryMethodInvocationListener;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +32,7 @@ public class AuctionServiceImpl implements AuctionService {
     private final AuctionWatchRepository auctionWatchRepository;
 
     @Override
-    public AuctionResponse findAuctionById(Long id) {
+    public AuctionResponse findAuctionById(UUID id) {
         var auction = auctionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction", "Id", id.toString()));
 
@@ -55,7 +53,7 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public AuctionResponse updateAuction(Long id, UpdateAuctionRequest request) {
+    public AuctionResponse updateAuction(UUID id, UpdateAuctionRequest request) {
         var auction = auctionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", id.toString()));
 
@@ -110,7 +108,7 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(UUID id) {
         var auction = auctionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", id.toString()));
 
@@ -122,7 +120,7 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public AuctionResponse cancelAuction(Long id) {
+    public AuctionResponse cancelAuction(UUID id) {
         var auction = auctionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", id.toString()));
 
@@ -139,7 +137,7 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public AuctionResponse pauseAuction(Long id) {
+    public AuctionResponse pauseAuction(UUID id) {
         var auction = auctionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", id.toString()));
 
@@ -156,7 +154,7 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public AuctionResponse resumeAuction(Long id) {
+    public AuctionResponse resumeAuction(UUID id) {
         var auction = auctionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", id.toString()));
 
@@ -169,7 +167,7 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public void addWatcher(Long id, Long userId) {
+    public void addWatcher(UUID id, UUID userId) {
         var auction = auctionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", id.toString()));
 
@@ -179,7 +177,7 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public void removeWatcher(Long id, Long userId) {
+    public void removeWatcher(UUID id, UUID userId) {
         var watch = auctionWatchRepository.findAuctionWatchByUserIdAndAuction_Id(userId, id)
                 .orElseThrow(() -> new ResourceNotFoundException("AuctionWatch", "userId, id", userId + ", " + id));
 
@@ -187,7 +185,7 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public List<Long> getWatcherIds(Long id) {
+    public List<Long> getWatcherIds(UUID id) {
         return auctionWatchRepository.findAllByAuction_Id(id)
                 .stream()
                 .toList();

@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -36,7 +37,7 @@ public class ProxyBidServiceImpl implements ProxyBidService {
 
     @Override
     @Transactional
-    public ProxyBidUpsertResult upsertProxyBid(ProxyBidRequest request, Long auctionId, Long bidderId) {
+    public ProxyBidUpsertResult upsertProxyBid(ProxyBidRequest request, UUID auctionId, UUID bidderId) {
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(
                 () -> new ResourceNotFoundException("Auction", "Id", auctionId.toString())
         );
@@ -69,16 +70,16 @@ public class ProxyBidServiceImpl implements ProxyBidService {
     }
 
     @Override
-    public ProxyBidResponse getProxyBid(Long auctionId, Long bidderId) {
+    public ProxyBidResponse getProxyBid(UUID auctionId, UUID bidderId) {
         ProxyBid proxyBid = proxyBidRepository.findByAuctionIdAndBidderId(auctionId, bidderId).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Proxy Bid not found for auction id = %d and bidder id = %d", auctionId, bidderId))
+                () -> new ResourceNotFoundException(String.format("Proxy Bid not found for auction id = %s and bidder id = %s", auctionId.toString(), bidderId.toString()))
         );
 
         return ProxyBidMapper.toResponseDto(proxyBid);
     }
 
     @Override
-    public void deleteProxyBid(Long auctionId, Long bidderId) {
+    public void deleteProxyBid(UUID auctionId, UUID bidderId) {
         ProxyBid proxyBid = proxyBidRepository.findByAuctionIdAndBidderId(auctionId, bidderId).orElseThrow(
                 () -> new ResourceNotFoundException(String.format("Proxy Bid not found for auction id = %d and bidder id = %d", auctionId, bidderId))
         );
@@ -86,8 +87,8 @@ public class ProxyBidServiceImpl implements ProxyBidService {
         proxyBidRepository.deleteById(proxyBid.getId());
     }
 
-    @Override
     @Transactional(propagation = Propagation.MANDATORY)
+    @Override
     public void triggerProxyBidding(Auction auction) {
         List<ProxyBid> proxyBids = proxyBidRepository.findAllByAuctionId(auction.getId());
         if (proxyBids.isEmpty()) {
@@ -96,7 +97,7 @@ public class ProxyBidServiceImpl implements ProxyBidService {
 
         Bid currentHighestBid = auction.getHighestBidPlaced();
         BigDecimal currentHighestAmount = (currentHighestBid != null ? currentHighestBid.getAmount() : auction.getStartingPrice());
-        Long currentHighestBidderId = (currentHighestBid != null ? currentHighestBid.getBidderId() : null);
+        UUID currentHighestBidderId = (currentHighestBid != null ? currentHighestBid.getBidderId() : null);
 
         List<ProxyBid> eligibleProxyBids = proxyBidRepository.findTopEligibleProxyBids(
                 auction.getId(),

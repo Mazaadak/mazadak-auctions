@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class AuctionSpecifications {
     public static Specification<Auction> hasHighestBidBetween(BigDecimal min, BigDecimal max) {
@@ -29,7 +30,7 @@ public class AuctionSpecifications {
         };
     }
 
-    public static Specification<Auction> hasSellerId(Long sellerId) {
+    public static Specification<Auction> hasSellerId(UUID sellerId) {
         return (root, query, builder) -> {
             if (sellerId == null) return null;
             return builder.equal(root.get("sellerId"), sellerId);

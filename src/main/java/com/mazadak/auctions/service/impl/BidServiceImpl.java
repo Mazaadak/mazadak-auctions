@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -31,7 +32,7 @@ public class BidServiceImpl implements BidService {
 
     @Transactional
     @Override
-    public BidResponse placeBid(PlaceBidRequest request, Long auctionId, String idempotencyKey) {
+    public BidResponse placeBid(PlaceBidRequest request, UUID auctionId, String idempotencyKey) {
         Optional<Bid> existingBid = bidRepository.findByIdempotencyKey(idempotencyKey);
         if (existingBid.isPresent()) {
             return BidMapper.toResponseDto(existingBid.get());
@@ -61,7 +62,7 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    public BidResponse getHighestBid(Long auctionId) {
+    public BidResponse getHighestBid(UUID auctionId) {
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(
                 () -> new ResourceNotFoundException("Auction", "auctionId", auctionId.toString())
         );
@@ -70,7 +71,7 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    public Page<BidResponse> getBids(Long id, Long bidderId, Pageable pageable) {
+    public Page<BidResponse> getBids(UUID id, UUID bidderId, Pageable pageable) {
         Auction auction = auctionRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Auction", "auctionId", id.toString())
         );
@@ -83,7 +84,7 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    public Page<BidResponse> getBidsByBidder(Long bidderId, Pageable pageable) {
+    public Page<BidResponse> getBidsByBidder(UUID bidderId, Pageable pageable) {
         Page<Bid> bids = bidRepository.findByBidderId(bidderId, pageable);
         return bids.map(BidMapper::toResponseDto);
     }

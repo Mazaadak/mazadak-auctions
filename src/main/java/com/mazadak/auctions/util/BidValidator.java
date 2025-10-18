@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 public class BidValidator {
@@ -21,7 +22,7 @@ public class BidValidator {
         }
     }
 
-    public void validateSellerIsNotBidder(Auction auction, Long bidderId) {
+    public void validateSellerIsNotBidder(Auction auction, UUID bidderId) {
         if (Objects.equals(bidderId, auction.getSellerId())) {
             throw new InvalidBidException("Seller cannot bid on their own auction");
         }
@@ -39,12 +40,12 @@ public class BidValidator {
 
     // TODO: Handle problem like someone adding 0.0000000000001 on the minAllowedBid
     public void validateMinimumBid(Auction auction, BigDecimal amount) {
-        Bid highestBidPlaced = auction.getHighestBidPlaced();
-        BigDecimal currentHighestBid = (highestBidPlaced != null ? highestBidPlaced.getAmount() : auction.getStartingPrice());
+        BigDecimal currentHighestBid = Optional.ofNullable(auction.getHighestBidPlaced())
+                .map(Bid::getAmount)
+                .orElse(auction.getStartingPrice());
         BigDecimal minAllowedBid = currentHighestBid.add(auction.getBidIncrement());
         if (amount.compareTo(minAllowedBid) < 0) {
             throw new InvalidBidException(amount, minAllowedBid);
         }
     }
-
 }

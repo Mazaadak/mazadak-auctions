@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Parameter;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 
 @Tag(name = "Bids", description = "Operations related to bids")
@@ -37,7 +38,7 @@ import java.math.BigDecimal;
 )
 @AllArgsConstructor
 @Validated
-@CrossOrigin("*")
+@CrossOrigin("*") // TODO: remove
 public class BidController {
 
     private final BidService bidService;
@@ -59,7 +60,7 @@ public class BidController {
     })
     @PostMapping("/{auctionId}/bids")
     public ResponseEntity<BidResponse> placeBid(
-            @PathVariable Long auctionId,
+            @PathVariable UUID auctionId,
             // TODO: don't forget to handle MissingRequestHeaderException() and return problem details if the key is missing
             @RequestHeader(value = "Idempotency-Key", required = true) String idempotencyKey,
             @Valid @NotNull @RequestBody PlaceBidRequest request
@@ -86,8 +87,8 @@ public class BidController {
             @ApiResponse(responseCode = "404", description = "Auction not found", content = @Content)
     })
     @GetMapping("/{auctionId}/bids")
-    public ResponseEntity<Page<BidResponse>> getBids(@PathVariable Long auctionId,
-                                                     @RequestParam(required = false) Long bidderId,
+    public ResponseEntity<Page<BidResponse>> getBids(@PathVariable UUID auctionId,
+                                                     @RequestParam(required = false) UUID bidderId,
                                                      @PageableDefault @SortDefault.SortDefaults({
                                                              @SortDefault(sort = "amount", direction = Sort.Direction.DESC),
                                                              @SortDefault(sort = "createdAt", direction = Sort.Direction.ASC)
@@ -109,7 +110,7 @@ public class BidController {
             @ApiResponse(responseCode = "404", description = "Auction not found", content = @Content)
     })
     @GetMapping("/{auctionId}/bids/highest")
-    public ResponseEntity<BidResponse> getHighestBid(@PathVariable Long auctionId) {
+    public ResponseEntity<BidResponse> getHighestBid(@PathVariable UUID auctionId) {
         BidResponse highestBid = bidService.getHighestBid(auctionId);
         return ResponseEntity.ok(highestBid);
     }
@@ -129,7 +130,7 @@ public class BidController {
             @ApiResponse(responseCode = "404", description = "Bidder not found", content = @Content)
     })
     @GetMapping("/bidder/{bidderId}/bids")
-    public ResponseEntity<Page<BidResponse>> getBidsByBidder(@PathVariable Long bidderId,
+    public ResponseEntity<Page<BidResponse>> getBidsByBidder(@PathVariable UUID bidderId,
                                                              @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
         return ResponseEntity.ok(bidService.getBidsByBidder(bidderId, pageable));
     }

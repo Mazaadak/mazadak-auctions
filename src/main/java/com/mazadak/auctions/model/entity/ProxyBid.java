@@ -1,6 +1,5 @@
 package com.mazadak.auctions.model.entity;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -8,6 +7,7 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 
 /*
@@ -31,10 +31,10 @@ CREATE TABLE proxy_bids (
 public class ProxyBid extends BaseEntity {
 
     @Column(nullable = false)
-    private Long auctionId;
+    private UUID auctionId;
 
     @Column(nullable = false)
-    private Long bidderId;
+    private UUID bidderId;
 
     private BigDecimal maxAmount;
 }

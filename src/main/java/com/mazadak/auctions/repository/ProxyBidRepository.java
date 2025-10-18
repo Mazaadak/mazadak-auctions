@@ -11,11 +11,12 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface ProxyBidRepository extends JpaRepository<ProxyBid, Long> {
-    Optional<ProxyBid> findByAuctionIdAndBidderId(Long auctionId, Long BidderId);
-    List<ProxyBid> findAllByAuctionId(Long auctionId);
+public interface ProxyBidRepository extends JpaRepository<ProxyBid, UUID> {
+    Optional<ProxyBid> findByAuctionIdAndBidderId(UUID auctionId, UUID BidderId);
+    List<ProxyBid> findAllByAuctionId(UUID auctionId);
 
     @Query("""
         SELECT p
@@ -25,7 +26,7 @@ public interface ProxyBidRepository extends JpaRepository<ProxyBid, Long> {
         ORDER BY p.maxAmount DESC, p.createdAt ASC
     """)
     List<ProxyBid> findTopEligibleProxyBids(
-            @Param("auctionId") Long auctionId,
+            @Param("auctionId") UUID auctionId,
             @Param("currentHighestAmount") BigDecimal currentHighestAmount,
             Pageable pageable
     );

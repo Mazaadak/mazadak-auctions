@@ -3,6 +3,8 @@ package com.mazadak.auctions.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "auction_watchlist")
 @Getter
@@ -15,7 +17,7 @@ public class AuctionWatch extends BaseEntity {
     @JoinColumn(name = "auction_id")
     private Auction auction;
 
-    private Long userId;
+    private UUID userId;
 
     private boolean notified = false;
 }

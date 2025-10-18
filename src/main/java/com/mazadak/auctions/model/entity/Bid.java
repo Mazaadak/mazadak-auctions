@@ -30,10 +30,10 @@ CREATE TABLE bids (
 public class Bid extends BaseEntity {
 
     @Column(nullable = false)
-    private Long auctionId;
+    private UUID auctionId;
 
     @Column(nullable = false)
-    private Long bidderId;
+    private UUID bidderId;
 
     private BigDecimal amount;
 
