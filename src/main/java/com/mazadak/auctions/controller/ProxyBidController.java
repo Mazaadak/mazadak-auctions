@@ -15,6 +15,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class ProxyBidController {
 
     @Operation(
             summary = "Create or update a proxy bid on an auction",
-            description = "Create or update a proxy bid for the auction identified by auctionId."
+            description = "Create or Update the proxy bid for the auction identified by `auctionId` and the bidder identified by `bidderId`."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -53,8 +54,18 @@ public class ProxyBidController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ProxyBidResponse.class))
             ),
-            @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Auction not found", content = @Content)
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Auction not found",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            )
     })
     @PutMapping("/{bidderId}")
     public ResponseEntity<ProxyBidResponse> upsertProxyBid(
@@ -72,12 +83,58 @@ public class ProxyBidController {
                 .body(result.response());
     }
 
+    @Operation(
+            summary = "Get a proxy bid on an auction",
+            description = "Retrieve the proxy bid for the auction identified by `auctionId` and the bidder identified by `bidderId`."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Proxy bid found",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ProxyBidResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Auction or proxy bid not found",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            )
+    })
     @GetMapping("/{bidderId}")
     public ResponseEntity<ProxyBidResponse> getProxyBid(@PathVariable UUID auctionId,
                                                         @PathVariable UUID bidderId) {
         return ResponseEntity.ok(proxyBidService.getProxyBid(auctionId, bidderId));
     }
 
+    @Operation(
+            summary = "Delete a proxy bid on an auction",
+            description = "Delete the proxy bid for the auction identified by `auctionId` and the bidder identified by `bidderId`."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Proxy bid deleted"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Auction or proxy bid not found",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            )
+    })
     @DeleteMapping("/{bidderId}")
     public ResponseEntity<Void> deleteProxyBid(@PathVariable UUID auctionId,
                                                @PathVariable UUID bidderId) {

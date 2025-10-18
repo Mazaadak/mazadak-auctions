@@ -48,7 +48,7 @@ public class BidController {
     // TODO: authentication
     @Operation(
             summary = "Place a bid on an auction",
-            description = "Places a bid for the auction identified by auctionId."
+            description = "Places a bid for the auction identified by `auctionId`."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -86,7 +86,7 @@ public class BidController {
 
     @Operation(
             summary = "Get bids for an auction",
-            description = "Returns a paginated list of bids for the specified auction. Optionally filter by bidderId."
+            description = "Returns a paginated list of bids for the auction identified by `auctionId`. Optionally filter by `bidderId`."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -121,7 +121,7 @@ public class BidController {
 
     @Operation(
             summary = "Get highest bid for an auction",
-            description = "Returns the highest bid amount for the specified auction."
+            description = "Returns the highest bid amount for the auction identified by `auctionId`."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -145,7 +145,7 @@ public class BidController {
 
     @Operation(
             summary = "Get bids by bidder",
-            description = "Returns a paginated list of bids placed by the specified bidder across auctions."
+            description = "Returns a paginated list of bids placed by the bidder identified by `bidderId` across all auctions."
     )
     @ApiResponses(value = {
             @ApiResponse(
