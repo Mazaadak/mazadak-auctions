@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+// TODO: authentication & authorization
 @Service
 @AllArgsConstructor
 public class ProxyBidServiceImpl implements ProxyBidService {

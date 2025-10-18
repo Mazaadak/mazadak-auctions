@@ -14,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -39,6 +40,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Validated
 @CrossOrigin("*") // TODO: remove
+// TODO: authentication & authorization
 public class BidController {
 
     private final BidService bidService;
@@ -53,10 +55,20 @@ public class BidController {
                     responseCode = "201",
                     description = "Bid created",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = BidResponse.class))
+                        schema = @Schema(implementation = BidResponse.class))
             ),
-            @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Auction not found", content = @Content)
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request",
+                    content = @Content(mediaType = "application/problem+json",
+                        schema = @Schema(implementation = ProblemDetail.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Auction not found",
+                    content = @Content(mediaType = "application/problem+json",
+                        schema = @Schema(implementation = ProblemDetail.class))
+            )
     })
     @PostMapping("/{auctionId}/bids")
     public ResponseEntity<BidResponse> placeBid(
@@ -83,8 +95,18 @@ public class BidController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = BidResponse.class))
             ),
-            @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Auction not found", content = @Content)
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Auction not found",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            )
     })
     @GetMapping("/{auctionId}/bids")
     public ResponseEntity<Page<BidResponse>> getBids(@PathVariable UUID auctionId,
@@ -105,9 +127,15 @@ public class BidController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Highest bid retrieved",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = BigDecimal.class))
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = BigDecimal.class))
             ),
-            @ApiResponse(responseCode = "404", description = "Auction not found", content = @Content)
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            )
     })
     @GetMapping("/{auctionId}/bids/highest")
     public ResponseEntity<BidResponse> getHighestBid(@PathVariable UUID auctionId) {
@@ -126,12 +154,25 @@ public class BidController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = BidResponse.class))
             ),
-            @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Bidder not found", content = @Content)
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Bidder not found",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            )
     })
     @GetMapping("/bidder/{bidderId}/bids")
     public ResponseEntity<Page<BidResponse>> getBidsByBidder(@PathVariable UUID bidderId,
-                                                             @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
+                                                             @PageableDefault(
+                                                                     sort = "createdAt",
+                                                                     direction = Sort.Direction.ASC
+                                                             ) Pageable pageable) {
         return ResponseEntity.ok(bidService.getBidsByBidder(bidderId, pageable));
     }
 

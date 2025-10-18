@@ -31,11 +31,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @Validated
 @CrossOrigin("*") // TODO: remove
+// TODO: authentication & authorization
 public class ProxyBidController {
 
     private final ProxyBidService proxyBidService;
 
-    // TODO: authentication
     @Operation(
             summary = "Create or update a proxy bid on an auction",
             description = "Create or update a proxy bid for the auction identified by auctionId."
