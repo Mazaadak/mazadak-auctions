@@ -30,6 +30,7 @@ public class BidResponse implements Serializable {
     @Schema(description = "Bid amount", example = "100.00")
     BigDecimal amount;
 
+    // TODO: remove
     @Schema(description = "Idempotency key used when placing the bid", example = "a1b2c3d4-e5f6-7g8h-9i0j")
     String idempotencyKey;
 }

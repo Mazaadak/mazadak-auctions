@@ -37,6 +37,7 @@ import java.math.BigDecimal;
 )
 @AllArgsConstructor
 @Validated
+@CrossOrigin("*")
 public class BidController {
 
     private final BidService bidService;

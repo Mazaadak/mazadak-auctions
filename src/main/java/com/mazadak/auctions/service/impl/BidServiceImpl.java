@@ -2,7 +2,6 @@ package com.mazadak.auctions.service.impl;
 
 import com.mazadak.auctions.dto.request.PlaceBidRequest;
 import com.mazadak.auctions.dto.response.BidResponse;
-import com.mazadak.auctions.exception.InvalidBidException;
 import com.mazadak.auctions.exception.ResourceNotFoundException;
 import com.mazadak.auctions.mapper.BidMapper;
 import com.mazadak.auctions.model.entity.Auction;
@@ -12,17 +11,13 @@ import com.mazadak.auctions.repository.AuctionRepository;
 import com.mazadak.auctions.repository.BidRepository;
 import com.mazadak.auctions.service.BidService;
 import com.mazadak.auctions.service.ProxyBidService;
-import com.mazadak.auctions.service.support.BidValidator;
+import com.mazadak.auctions.util.BidValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -60,6 +55,7 @@ public class BidServiceImpl implements BidService {
         bidRepository.save(newBid);
         auction.setHighestBidPlaced(newBid);
         auctionRepository.save(auction);
+        proxyBidService.triggerProxyBidding(auction);
 
         return BidMapper.toResponseDto(newBid);
     }

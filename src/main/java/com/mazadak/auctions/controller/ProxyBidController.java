@@ -1,10 +1,9 @@
 package com.mazadak.auctions.controller;
 
 import com.mazadak.auctions.dto.request.ProxyBidRequest;
-import com.mazadak.auctions.dto.response.BidResponse;
 import com.mazadak.auctions.dto.response.ProxyBidResponse;
 import com.mazadak.auctions.service.ProxyBidService;
-import com.mazadak.auctions.service.support.UpsertResult;
+import com.mazadak.auctions.util.ProxyBidUpsertResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,7 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import org.apache.coyote.Request;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +29,7 @@ import java.net.URI;
 )
 @AllArgsConstructor
 @Validated
+@CrossOrigin("*")
 public class ProxyBidController {
 
     private final ProxyBidService proxyBidService;
@@ -63,7 +62,7 @@ public class ProxyBidController {
             @Valid @NotNull @RequestBody ProxyBidRequest request
     ) {
 
-        UpsertResult result = proxyBidService.upsertProxyBid(request, auctionId, bidderId);
+        ProxyBidUpsertResult result = proxyBidService.upsertProxyBid(request, auctionId, bidderId);
         HttpStatus status = (result.created() ? HttpStatus.CREATED : HttpStatus.OK);
         URI location = URI.create(String.format("auctions/%d/proxy-bids/%d", auctionId, bidderId));
 

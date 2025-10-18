@@ -1,7 +1,8 @@
-package com.mazadak.auctions.service.support;
+package com.mazadak.auctions.util;
 
 import com.mazadak.auctions.exception.InvalidBidException;
 import com.mazadak.auctions.model.entity.Auction;
+import com.mazadak.auctions.model.entity.Bid;
 import com.mazadak.auctions.model.enumeration.AuctionStatus;
 import org.springframework.stereotype.Component;
 
@@ -36,8 +37,10 @@ public class BidValidator {
         }
     }
 
+    // TODO: Handle problem like someone adding 0.0000000000001 on the minAllowedBid
     public void validateMinimumBid(Auction auction, BigDecimal amount) {
-        BigDecimal currentHighestBid = Optional.ofNullable(auction.getHighestBidPlaced()).orElse(auction.getStartingPrice());
+        Bid highestBidPlaced = auction.getHighestBidPlaced();
+        BigDecimal currentHighestBid = (highestBidPlaced != null ? highestBidPlaced.getAmount() : auction.getStartingPrice());
         BigDecimal minAllowedBid = currentHighestBid.add(auction.getBidIncrement());
         if (amount.compareTo(minAllowedBid) < 0) {
             throw new InvalidBidException(amount, minAllowedBid);
