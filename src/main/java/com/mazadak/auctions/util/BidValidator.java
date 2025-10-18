@@ -15,6 +15,14 @@ import java.util.UUID;
 
 @Component
 public class BidValidator {
+
+    public void validateBid(Auction auction, BigDecimal amount, UUID bidderId) {
+        validateAuctionStatus(auction);
+        validateSellerIsNotBidder(auction, bidderId);
+        validateAuctionTimeWindow(auction);
+        validateMinimumBid(auction, amount);
+    }
+
     public void validateAuctionStatus(Auction auction) {
         AuctionStatus status = auction.getStatus();
         if (!(status.equals(AuctionStatus.STARTED) || status.equals(AuctionStatus.ACTIVE))) {

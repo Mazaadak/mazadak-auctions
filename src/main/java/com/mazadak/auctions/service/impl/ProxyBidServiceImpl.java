@@ -41,11 +41,7 @@ public class ProxyBidServiceImpl implements ProxyBidService {
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(
                 () -> new ResourceNotFoundException("Auction", "Id", auctionId.toString())
         );
-
-        bidValidator.validateAuctionStatus(auction);
-        bidValidator.validateSellerIsNotBidder(auction, bidderId);
-        bidValidator.validateAuctionTimeWindow(auction);
-        bidValidator.validateMinimumBid(auction, request.getMaxAmount());
+        bidValidator.validateBid(auction, request.getMaxAmount(), bidderId);
 
         Optional<ProxyBid> optionalExistingBid = proxyBidRepository.findByAuctionIdAndBidderId(auctionId, bidderId);
         if (optionalExistingBid.isPresent()) {
@@ -81,7 +77,7 @@ public class ProxyBidServiceImpl implements ProxyBidService {
     @Override
     public void deleteProxyBid(UUID auctionId, UUID bidderId) {
         ProxyBid proxyBid = proxyBidRepository.findByAuctionIdAndBidderId(auctionId, bidderId).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Proxy Bid not found for auction id = %d and bidder id = %d", auctionId, bidderId))
+                () -> new ResourceNotFoundException(String.format("Proxy Bid not found for auction id = %s and bidder id = %s", auctionId, bidderId))
         );
 
         proxyBidRepository.deleteById(proxyBid.getId());
@@ -97,7 +93,6 @@ public class ProxyBidServiceImpl implements ProxyBidService {
 
         Bid currentHighestBid = auction.getHighestBidPlaced();
         BigDecimal currentHighestAmount = (currentHighestBid != null ? currentHighestBid.getAmount() : auction.getStartingPrice());
-        UUID currentHighestBidderId = (currentHighestBid != null ? currentHighestBid.getBidderId() : null);
 
         List<ProxyBid> eligibleProxyBids = proxyBidRepository.findTopEligibleProxyBids(
                 auction.getId(),
