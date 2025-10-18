@@ -4,17 +4,19 @@ import com.mazadak.auctions.dto.request.PlaceBidRequest;
 import com.mazadak.auctions.dto.response.BidResponse;
 import com.mazadak.auctions.model.entity.Bid;
 
+import java.util.UUID;
+
 public class BidMapper {
-    public static Bid toEntity(PlaceBidRequest dto) {
+    public static Bid toEntity(PlaceBidRequest dto, UUID auctionId, String idempotencyKey) {
         return new Bid(
-                dto.getAuctionId(),
+                auctionId,
                 dto.getBidderId(),
                 dto.getAmount(),
-                dto.getIdempotencyKey()
+                idempotencyKey
         );
     }
 
-    public static BidResponse toBidResponse(Bid bid) {
+    public static BidResponse toResponseDto(Bid bid) {
         return new BidResponse(
                 bid.getId(),
                 bid.getAuctionId(),

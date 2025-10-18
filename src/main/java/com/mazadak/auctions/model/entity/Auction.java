@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "auctions")
@@ -17,10 +18,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Auction extends BaseEntity {
     @Column(nullable = false)
-    private Long productId;
+    private UUID productId;
 
     @Column(nullable = false)
-    private Long sellerId;
+    private UUID sellerId;
 
     @Column(nullable = false)
     private String title;
@@ -30,7 +31,9 @@ public class Auction extends BaseEntity {
 
     private BigDecimal reservePrice = startingPrice;
 
-    private BigDecimal highestBidPlaced;
+    @OneToOne
+    @JoinColumn(name = "highest_bid_placed_id")
+    private Bid highestBidPlaced;
 
     @Column(nullable = false)
     private BigDecimal bidIncrement;

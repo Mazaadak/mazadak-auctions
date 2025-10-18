@@ -10,7 +10,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.UUID;
 
+// TODO: Change all Ids to UUID, and Change the examples in OpenAPI documentation
 @Getter
 @Setter
 @MappedSuperclass
@@ -18,7 +20,7 @@ import java.time.Instant;
 public abstract class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private UUID id;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

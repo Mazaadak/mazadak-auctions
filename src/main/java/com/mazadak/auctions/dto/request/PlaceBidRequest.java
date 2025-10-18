@@ -1,6 +1,5 @@
 package com.mazadak.auctions.dto.request;
 
-import com.mazadak.auctions.validation.annotation.ValidBidPlacement;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -19,25 +18,13 @@ import java.util.UUID;
         description = "Schema to Hold Place Bid Request Information"
 )
 @Value
-@ValidBidPlacement
 public class PlaceBidRequest implements Serializable {
-    // TODO: Change example when changing Id to UUID
-    @Schema(description = "Identifier of the auction the bid is placed on", example = "123", required = true)
-    @NotNull(message = "A bid must be associated with an auction")
-    Long auctionId;
-
-    // TODO: Change example when changing Id to UUID
-    @Schema(description = "Identifier of the bidder placing the bid", example = "456", required = true)
+    @Schema(description = "Identifier of the bidder placing the bid", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6", required = true)
     @NotNull(message = "A bid must be associated with a bidder")
-    Long bidderId;
+    UUID bidderId;
 
     @Schema(description = "Amount of the bid in the auction currency", example = "100.00", required = true, type = "number", format = "decimal")
     @NotNull(message = "A bid must have an amount")
     @Positive(message = "Bid amount must be positive")
     BigDecimal amount;
-
-    @Schema(description = "Idempotency key to prevent duplicate bids. Optional.", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
-    String idempotencyKey;
 }
-
-// @NotNull(message = "An auction must be associated with a product")

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * DTO for {@link com.mazadak.auctions.model.entity.Auction}
@@ -14,8 +15,8 @@ import java.time.LocalDateTime;
 @ValidReservePrice
 @ValidStartAndEndTimes
 public record CreateAuctionRequest(
-        @NotNull(message = "An auction must be associated with a product") Long productId,
-        @NotNull(message = "An auction must be associated with a seller") Long sellerId,
+        @NotNull(message = "An auction must be associated with a product") UUID productId,
+        @NotNull(message = "An auction must be associated with a seller") UUID sellerId,
         @NotBlank(message = "Auction title cannot be blank") String title,
         @NotNull(message = "An auction must have a starting price") @Positive(message = "Auction starting price must be positive") BigDecimal startingPrice,
         @Positive(message = "Reserve price must be positive") BigDecimal reservePrice,

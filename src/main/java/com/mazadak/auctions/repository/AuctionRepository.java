@@ -10,15 +10,15 @@ import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
+import java.util.UUID;
 
-public interface AuctionRepository extends JpaRepository<Auction, Long>, JpaSpecificationExecutor<Auction> {
+public interface AuctionRepository extends JpaRepository<Auction, UUID>, JpaSpecificationExecutor<Auction> {
   
     @Lock(LockModeType.PESSIMISTIC_READ)
     @Query("SELECT a FROM Auction a WHERE a.id = :id")
-    Optional<Auction> findByIdForUpdate(Long id);
+    Optional<Auction> findByIdForUpdate(UUID id);
   
     @Query("""
             SELECT a FROM Auction a

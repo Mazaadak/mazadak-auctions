@@ -1,0 +1,145 @@
+package com.mazadak.auctions.controller;
+
+import com.mazadak.auctions.dto.request.ProxyBidRequest;
+import com.mazadak.auctions.dto.response.ProxyBidResponse;
+import com.mazadak.auctions.service.ProxyBidService;
+import com.mazadak.auctions.util.ProxyBidUpsertResult;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.util.UUID;
+
+@Tag(name = "Proxy bids", description = "Operations to related to proxy bids")
+@RestController
+@RequestMapping(
+        value = "auctions/{auctionId}/proxy-bids/",
+        produces = MediaType.APPLICATION_JSON_VALUE
+)
+@AllArgsConstructor
+@Validated
+@CrossOrigin("*") // TODO: remove
+// TODO: authentication & authorization
+public class ProxyBidController {
+
+    private final ProxyBidService proxyBidService;
+
+    @Operation(
+            summary = "Create or update a proxy bid on an auction",
+            description = "Create or Update the proxy bid for the auction identified by `auctionId` and the bidder identified by `bidderId`."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Proxy bid created",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ProxyBidResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Proxy bid updated",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ProxyBidResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Auction not found",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            )
+    })
+    @PutMapping("/{bidderId}")
+    public ResponseEntity<ProxyBidResponse> upsertProxyBid(
+            @PathVariable UUID auctionId,
+            @PathVariable UUID bidderId,
+            @Valid @NotNull @RequestBody ProxyBidRequest request
+    ) {
+
+        ProxyBidUpsertResult result = proxyBidService.upsertProxyBid(request, auctionId, bidderId);
+        HttpStatus status = (result.created() ? HttpStatus.CREATED : HttpStatus.OK);
+        URI location = URI.create(String.format("auctions/%s/proxy-bids/%s", auctionId.toString(), bidderId.toString()));
+
+        return ResponseEntity.status(status)
+                .location(location)
+                .body(result.response());
+    }
+
+    @Operation(
+            summary = "Get a proxy bid on an auction",
+            description = "Retrieve the proxy bid for the auction identified by `auctionId` and the bidder identified by `bidderId`."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Proxy bid found",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ProxyBidResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Auction or proxy bid not found",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            )
+    })
+    @GetMapping("/{bidderId}")
+    public ResponseEntity<ProxyBidResponse> getProxyBid(@PathVariable UUID auctionId,
+                                                        @PathVariable UUID bidderId) {
+        return ResponseEntity.ok(proxyBidService.getProxyBid(auctionId, bidderId));
+    }
+
+    @Operation(
+            summary = "Delete a proxy bid on an auction",
+            description = "Delete the proxy bid for the auction identified by `auctionId` and the bidder identified by `bidderId`."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Proxy bid deleted"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Auction or proxy bid not found",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ProblemDetail.class))
+            )
+    })
+    @DeleteMapping("/{bidderId}")
+    public ResponseEntity<Void> deleteProxyBid(@PathVariable UUID auctionId,
+                                               @PathVariable UUID bidderId) {
+        proxyBidService.deleteProxyBid(auctionId, bidderId);
+        return ResponseEntity.noContent().build();
+    }
+
+}

@@ -6,26 +6,26 @@ import com.mazadak.auctions.dto.request.UpdateAuctionRequest;
 import com.mazadak.auctions.dto.response.AuctionResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.UUID;
 
 
 public interface AuctionService {
     // CRUD
-    AuctionResponse findAuctionById(Long id);
+    AuctionResponse findAuctionById(UUID id);
     Page<AuctionResponse> findAuctionsByCriteria(AuctionFilterDto filter, Pageable pageable);
     AuctionResponse createAuction(CreateAuctionRequest dto);
-    AuctionResponse updateAuction(Long id, UpdateAuctionRequest request);
-    void deleteById(Long id);
+    AuctionResponse updateAuction(UUID id, UpdateAuctionRequest request);
+    void deleteById(UUID id);
 
     // STATUS
-    AuctionResponse cancelAuction(Long id);
-    AuctionResponse pauseAuction(Long id);
-    AuctionResponse resumeAuction(Long id);
+    AuctionResponse cancelAuction(UUID id);
+    AuctionResponse pauseAuction(UUID id);
+    AuctionResponse resumeAuction(UUID id);
 
     // WATCH
-    void addWatcher(Long id, Long userId);
-    void removeWatcher(Long id, Long userId);
-    List<Long> getWatcherIds(Long id);
+    void addWatcher(UUID id, UUID userId);
+    void removeWatcher(UUID id, UUID userId);
+    List<Long> getWatcherIds(UUID id);
 }

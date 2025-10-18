@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 /*
-* CREATE TABLE bids (
+CREATE TABLE bids (
   bid_id BIGINT AUTO_INCREMENT PRIMARY KEY,
   auction_id BIGINT NOT NULL,
   bidder_id BIGINT NOT NULL,
@@ -18,8 +18,7 @@ import java.util.UUID;
   INDEX idx_auction_amount (auction_id, amount DESC, created_at ASC),
   FOREIGN KEY (auction_id) REFERENCES auctions(auction_id)
 );
-
-* */
+*/
 
 
 @Entity
@@ -31,14 +30,13 @@ import java.util.UUID;
 public class Bid extends BaseEntity {
 
     @Column(nullable = false)
-    private Long auctionId;
+    private UUID auctionId;
 
     @Column(nullable = false)
-    private Long bidderId;
+    private UUID bidderId;
 
     private BigDecimal amount;
 
-    // TODO: Make a final decision to keep this nullable or enforce not nullable (this relies on how proxy bids are handled)
     @Column(unique = true)
     private String idempotencyKey;
 }
