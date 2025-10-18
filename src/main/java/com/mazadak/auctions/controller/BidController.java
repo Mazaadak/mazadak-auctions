@@ -26,8 +26,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Parameter;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.UUID;
 
 
@@ -78,9 +80,12 @@ public class BidController {
             @Valid @NotNull @RequestBody PlaceBidRequest request
     ) {
         BidResponse bidResponse = bidService.placeBid(request, auctionId, idempotencyKey);
+        URI location = UriComponentsBuilder
+                .fromPath("/auctions/{auctionId}/bids")
+                .buildAndExpand(bidResponse.getAuctionId())
+                .toUri();
 
-        // TODO: Handle XSS Vulnerability
-        return ResponseEntity.status(HttpStatus.CREATED).body(bidResponse);
+        return ResponseEntity.created(location).body(bidResponse); // XSS warning is a false positive
     }
 
 
