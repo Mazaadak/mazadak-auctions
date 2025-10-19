@@ -2,6 +2,7 @@ package com.mazadak.auctions.mapper;
 
 import com.mazadak.auctions.dto.request.PlaceBidRequest;
 import com.mazadak.auctions.dto.response.BidResponse;
+import com.mazadak.auctions.dto.response.BidderInfo;
 import com.mazadak.auctions.model.entity.Bid;
 
 import java.util.UUID;
@@ -23,6 +24,14 @@ public class BidMapper {
                 bid.getBidderId(),
                 bid.getAmount(),
                 bid.getIdempotencyKey()
+        );
+    }
+
+    public static BidderInfo toBidderInfo(Bid bid) {
+        return new BidderInfo(
+                bid.getBidderId(),
+                bid.getAmount(),
+                "example@gmail.com" // TODO fetch email
         );
     }
 }

@@ -1,5 +1,6 @@
 package com.mazadak.auctions.model.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
@@ -16,6 +17,7 @@ public class OutboxEvent extends BaseEntity {
 
     private String eventType;
 
+    @Column(columnDefinition = "TEXT")
     private String payload;
 
     private boolean published = false;

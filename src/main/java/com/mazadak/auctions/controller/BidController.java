@@ -82,7 +82,7 @@ public class BidController {
         BidResponse bidResponse = bidService.placeBid(request, auctionId, idempotencyKey);
         URI location = UriComponentsBuilder
                 .fromPath("/auctions/{auctionId}/bids")
-                .buildAndExpand(bidResponse.getAuctionId())
+                .buildAndExpand(bidResponse.auctionId())
                 .toUri();
 
         return ResponseEntity.created(location).body(bidResponse); // XSS warning is a false positive

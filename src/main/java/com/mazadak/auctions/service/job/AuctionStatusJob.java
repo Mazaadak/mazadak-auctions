@@ -2,14 +2,18 @@ package com.mazadak.auctions.service.job;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mazadak.auctions.dto.event.AuctionEndedEvent;
 import com.mazadak.auctions.dto.event.AuctionStartedEvent;
+import com.mazadak.auctions.mapper.AuctionMapper;
 import com.mazadak.auctions.model.entity.Auction;
 import com.mazadak.auctions.model.entity.OutboxEvent;
 import com.mazadak.auctions.model.enumeration.AuctionStatus;
 import com.mazadak.auctions.repository.AuctionRepository;
 import com.mazadak.auctions.repository.OutboxEventRepository;
+import com.mazadak.auctions.service.BidService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,11 +24,12 @@ import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuctionStatusJob {
     private final AuctionRepository auctionRepository;
     private final OutboxEventRepository outboxEventRepository;
     private final ObjectMapper objectMapper;
-    private final Logger logger = LoggerFactory.getLogger(AuctionStatusJob.class);
+    private final BidService bidService;
 
     @Scheduled(cron = "0 * * * * *")
     @Transactional
@@ -34,7 +39,7 @@ public class AuctionStatusJob {
         var dueAuctions = auctionRepository.findDueAuctions(now);
         var updatedAuctions = new ArrayList<Auction>();
 
-        logger.info("Processing {} auctions due for status update", dueAuctions.size());
+        log.info("Processing {} auctions due for status update", dueAuctions.size());
 
         for (var auction : dueAuctions) {
             try {
@@ -44,7 +49,7 @@ public class AuctionStatusJob {
                     updatedAuctions.add(auction);
                 }
             } catch (Exception e) {
-                logger.error("Failed to update auction {}", auction.getId(), e);
+                log.error("Failed to update auction {}", auction.getId(), e);
             }
         }
 
@@ -57,14 +62,14 @@ public class AuctionStatusJob {
         switch (auction.getStatus()) {
             case SCHEDULED -> {
                 if (auction.getEndTime().isBefore(now) || auction.getEndTime().isEqual(now)) {
-                    auction.setStatus(AuctionStatus.ENDED);
+                    endAuction(auction);
                 } else if (auction.getStartTime().isBefore(now) || auction.getStartTime().isEqual(now)) {
                     startAuction(auction);
                 }
             }
             case STARTED, ACTIVE, PAUSED -> {
                 if (auction.getEndTime().isBefore(now) || auction.getEndTime().isEqual(now)) {
-                    auction.setStatus(AuctionStatus.ENDED);
+                    endAuction(auction);
                 }
             }
             default -> {}
@@ -72,6 +77,7 @@ public class AuctionStatusJob {
     }
 
     private void startAuction(Auction auction) {
+        log.info("Starting auction {}", auction.getId());
         auction.setStatus(AuctionStatus.STARTED);
 
         try {
@@ -83,8 +89,24 @@ public class AuctionStatusJob {
             );
             outboxEventRepository.save(outboxEvent);
         } catch (JsonProcessingException e) {
-            logger.error("Failed to serialize AuctionStartedEvent for auction {}", auction.getId(), e);
+            log.error("Failed to serialize AuctionStartedEvent for auction {}", auction.getId(), e);
         }
+    }
 
+    private void endAuction(Auction auction) {
+        log.info("Ending auction {}", auction.getId());
+        auction.setStatus(AuctionStatus.ENDED);
+        try {
+            var event = new AuctionEndedEvent(AuctionMapper.toResponseDto(auction), bidService.getHighestBidForEachBidderAboveReservePrice(auction.getId()));
+            var outboxEvent = new OutboxEvent(
+                    "AuctionEndedEvent",
+                    "AuctionEnded",
+                    objectMapper.writeValueAsString(event),
+                    false
+            );
+            outboxEventRepository.save(outboxEvent);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to serialize AuctionEndedEvent for auction {}", auction.getId(), e);
+        }
     }
 }
