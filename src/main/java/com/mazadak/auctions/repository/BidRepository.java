@@ -1,6 +1,5 @@
 package com.mazadak.auctions.repository;
 
-import com.mazadak.auctions.dto.response.BidResponse;
 import com.mazadak.auctions.model.entity.Bid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,13 +26,15 @@ public interface BidRepository extends JpaRepository<Bid, UUID> {
        FROM bids b
        INNER JOIN (
            SELECT bidder_id, MAX(amount) AS max_amount
-           FROM bids
-           WHERE auction_id = :auctionId
+           FROM bids sb 
+           INNER JOIN auctions a
+           ON sb.auction_id = a.id
+           WHERE sb.auction_id = :auctionId AND sb.amount >= a.reserve_price
            GROUP BY bidder_id
        ) AS sub ON b.bidder_id = sub.bidder_id
            AND b.amount = sub.max_amount
        WHERE b.auction_id = :auctionId
        ORDER BY b.amount DESC, b.created_at ASC
     """, nativeQuery = true)
-    List<Bid> findHighestBidsPerBidderByAuctionId(@Param("auctionId") UUID auctionId);
+    List<Bid> findHighestBidsPerBidderByAuctionIdAboveReservePrice(@Param("auctionId") UUID auctionId);
 }

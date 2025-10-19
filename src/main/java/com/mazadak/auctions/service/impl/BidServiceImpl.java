@@ -91,8 +91,8 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    public List<BidderInfo> getHighestBidForEachBidder(UUID auctionId) {
-        return bidRepository.findHighestBidsPerBidderByAuctionId(auctionId).stream()
+    public List<BidderInfo> getHighestBidForEachBidderAboveReservePrice(UUID auctionId) {
+        return bidRepository.findHighestBidsPerBidderByAuctionIdAboveReservePrice(auctionId).stream()
                 .map(BidMapper::toBidderInfo)
                 .toList();
     }

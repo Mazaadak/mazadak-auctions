@@ -97,7 +97,7 @@ public class AuctionStatusJob {
         log.info("Ending auction {}", auction.getId());
         auction.setStatus(AuctionStatus.ENDED);
         try {
-            var event = new AuctionEndedEvent(AuctionMapper.toResponseDto(auction), bidService.getHighestBidForEachBidder(auction.getId()));
+            var event = new AuctionEndedEvent(AuctionMapper.toResponseDto(auction), bidService.getHighestBidForEachBidderAboveReservePrice(auction.getId()));
             var outboxEvent = new OutboxEvent(
                     "AuctionEndedEvent",
                     "AuctionEnded",

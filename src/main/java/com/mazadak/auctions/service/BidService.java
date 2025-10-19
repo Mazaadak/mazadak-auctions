@@ -15,5 +15,5 @@ public interface BidService {
     BidResponse getHighestBid(UUID auctionId);
     Page<BidResponse> getBids(UUID id, UUID bidderId, Pageable pageable);
     Page<BidResponse> getBidsByBidder(UUID bidderId, Pageable pageable);
-    List<BidderInfo> getHighestBidForEachBidder(UUID auctionId);
+    List<BidderInfo> getHighestBidForEachBidderAboveReservePrice(UUID auctionId);
 }
