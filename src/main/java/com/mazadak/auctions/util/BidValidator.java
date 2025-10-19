@@ -15,6 +15,14 @@ import java.util.UUID;
 
 @Component
 public class BidValidator {
+
+    public void validateBid(Auction auction, BigDecimal amount, UUID bidderId) {
+        validateAuctionStatus(auction);
+        validateSellerIsNotBidder(auction, bidderId);
+        validateAuctionTimeWindow(auction);
+        validateMinimumBid(auction, amount);
+    }
+
     public void validateAuctionStatus(Auction auction) {
         AuctionStatus status = auction.getStatus();
         if (!(status.equals(AuctionStatus.STARTED) || status.equals(AuctionStatus.ACTIVE))) {
@@ -38,6 +46,7 @@ public class BidValidator {
         }
     }
 
+    // TODO: Handle problem like someone adding 0.0000000000001 on the minAllowedBid
     public void validateMinimumBid(Auction auction, BigDecimal amount) {
         BigDecimal currentHighestBid = Optional.ofNullable(auction.getHighestBidPlaced())
                 .map(Bid::getAmount)

@@ -40,26 +40,34 @@ public class BidServiceImpl implements BidService {
             return BidMapper.toResponseDto(existingBid.get());
         }
 
-        // This locks the auction record, other threads are allowed to read only.
+        Auction auction = lockAndValidateAuction(request, auctionId);
+        activateAuctionIfFirstBid(auction);
+        Bid newBid = createAndSaveBid(request, auctionId, idempotencyKey, auction);
+        proxyBidService.triggerProxyBidding(auction);
+        return BidMapper.toResponseDto(newBid);
+    }
+
+    private Auction lockAndValidateAuction(PlaceBidRequest request, UUID auctionId) {
         Auction auction = auctionRepository.findByIdForUpdate(auctionId).orElseThrow(
                 () -> new ResourceNotFoundException("Auction", "Id", auctionId.toString())
         );
 
-        bidValidator.validateAuctionStatus(auction);
-        bidValidator.validateSellerIsNotBidder(auction, request.getBidderId());
-        bidValidator.validateAuctionTimeWindow(auction);
-        bidValidator.validateMinimumBid(auction, request.getAmount());
+        bidValidator.validateBid(auction, request.getAmount(), request.getBidderId());
+        return auction;
+    }
 
+    private void activateAuctionIfFirstBid(Auction auction) {
         if (auction.getStatus().equals(AuctionStatus.STARTED) && bidRepository.countByAuctionId(auction.getId()) == 0L) {
             auction.setStatus(AuctionStatus.ACTIVE);
         }
+    }
 
+    private Bid createAndSaveBid(PlaceBidRequest request, UUID auctionId, String idempotencyKey, Auction auction) {
         Bid newBid = BidMapper.toEntity(request, auctionId, idempotencyKey);
         bidRepository.save(newBid);
         auction.setHighestBidPlaced(newBid);
         auctionRepository.save(auction);
-
-        return BidMapper.toResponseDto(newBid);
+        return newBid;
     }
 
     @Override

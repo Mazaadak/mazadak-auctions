@@ -20,5 +20,5 @@ public record BidResponse(
         UUID auctionId,
         UUID bidderId,
         BigDecimal amount,
-        String idempotencyKey
+        String idempotencyKey // TODO: remove
 ) implements Serializable { }
