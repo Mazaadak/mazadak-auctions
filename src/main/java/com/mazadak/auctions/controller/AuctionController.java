@@ -28,7 +28,6 @@ import java.util.UUID;
 )
 @Validated
 @AllArgsConstructor
-@CrossOrigin("*") // TODO: remove
 public class AuctionController {
     private final AuctionService auctionService;
     private final Logger logger = LoggerFactory.getLogger(AuctionController.class);
