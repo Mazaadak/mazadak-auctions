@@ -31,7 +31,6 @@ import java.util.UUID;
 )
 @AllArgsConstructor
 @Validated
-@CrossOrigin("*") // TODO: remove
 // TODO: authentication & authorization
 public class ProxyBidController {
 
