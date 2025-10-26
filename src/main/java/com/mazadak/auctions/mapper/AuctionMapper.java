@@ -33,7 +33,8 @@ public class AuctionMapper {
                 dto.bidIncrement(),
                 dto.startTime(),
                 dto.endTime(),
-                AuctionStatus.SCHEDULED
+                AuctionStatus.SCHEDULED,
+                false
         );
     }
 
