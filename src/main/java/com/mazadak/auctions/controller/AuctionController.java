@@ -37,6 +37,11 @@ public class AuctionController {
         return ResponseEntity.ok(auctionService.findAuctionById(id));
     }
 
+    @GetMapping("/exists/{productId}")
+    ResponseEntity<Boolean> existsByProductId(@PathVariable UUID productId) {
+        return ResponseEntity.ok(auctionService.existsByProductId(productId));
+    }
+
     @GetMapping
     Page<AuctionResponse> findAuctionsByCriteria(
             @ModelAttribute AuctionFilterDto filter,
@@ -61,8 +66,8 @@ public class AuctionController {
 
     // TODO: authentication
     @PostMapping
-    ResponseEntity<AuctionResponse> createAuction(@Valid @RequestBody CreateAuctionRequest dto) {
-        return ResponseEntity.ok(auctionService.createAuction(dto));
+    ResponseEntity<AuctionResponse> createAuction(@RequestHeader("Idempotency-Key") UUID idempotencyKey, @Valid @RequestBody CreateAuctionRequest dto) {
+        return ResponseEntity.ok(auctionService.createAuction(idempotencyKey, dto));
     }
 
     // TODO: authorization
@@ -98,5 +103,16 @@ public class AuctionController {
     @GetMapping("{id}/watchers")
     ResponseEntity<List<Long>> getWatchers(@PathVariable UUID id) {
         return ResponseEntity.ok(auctionService.getWatcherIds(id));
+    }
+
+    @PostMapping("/{auctionId}/restore")
+    ResponseEntity<Void> restoreAuction(@PathVariable UUID auctionId) {
+        auctionService.restoreAuction(auctionId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/products/{productId}")
+    AuctionResponse getByProductId(@PathVariable UUID productId) {
+        return auctionService.findListedAuctionByProductId(productId);
     }
 }

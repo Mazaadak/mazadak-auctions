@@ -4,17 +4,20 @@ import com.mazadak.auctions.dto.request.AuctionFilterDto;
 import com.mazadak.auctions.dto.request.CreateAuctionRequest;
 import com.mazadak.auctions.dto.request.UpdateAuctionRequest;
 import com.mazadak.auctions.dto.response.AuctionResponse;
-import com.mazadak.auctions.exception.InvalidAuctionOperationException;
-import com.mazadak.auctions.exception.ResourceNotFoundException;
+import com.mazadak.auctions.exception.*;
 import com.mazadak.auctions.mapper.AuctionMapper;
 import com.mazadak.auctions.model.entity.Auction;
 import com.mazadak.auctions.model.entity.AuctionWatch;
+import com.mazadak.auctions.model.entity.IdempotencyRecord;
 import com.mazadak.auctions.model.enumeration.AuctionStatus;
 import com.mazadak.auctions.repository.AuctionRepository;
 import com.mazadak.auctions.repository.AuctionWatchRepository;
+import com.mazadak.auctions.repository.IdempotencyRepository;
 import com.mazadak.auctions.repository.specification.AuctionSpecifications;
 import com.mazadak.auctions.service.AuctionService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -30,6 +34,7 @@ import java.util.UUID;
 public class AuctionServiceImpl implements AuctionService {
     private final AuctionRepository auctionRepository;
     private final AuctionWatchRepository auctionWatchRepository;
+    private final IdempotencyRepository idempotencyRepository;
 
     @Override
     public AuctionResponse findAuctionById(UUID id) {
@@ -47,9 +52,23 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public AuctionResponse createAuction(CreateAuctionRequest dto) {
-        var saved = auctionRepository.save(AuctionMapper.toEntity(dto));
-        return AuctionMapper.toResponseDto(saved);
+    @Transactional
+    public AuctionResponse createAuction(UUID idempotencyKey, CreateAuctionRequest dto) {
+        try {
+            var idempotency = new IdempotencyRecord(idempotencyKey, false);
+            idempotencyRepository.save(idempotency);
+
+            if (auctionRepository.listedAuctionExistsForProduct(dto.productId())) {
+                throw new ProductAlreadyHasAListedAuctionException("An auction is already listed for product " + dto.productId());
+            }
+
+            var saved = auctionRepository.save(AuctionMapper.toEntity(dto));
+            idempotency.setProcessed(true);
+
+            return AuctionMapper.toResponseDto(saved);
+        } catch (DataIntegrityViolationException e) {
+            throw new IdempotencyKeyAlreadyExistsException(idempotencyKey, "Auction", dto);
+        }
     }
 
     @Override
@@ -116,7 +135,8 @@ public class AuctionServiceImpl implements AuctionService {
             throw new InvalidAuctionOperationException("Cannot update an auction that is already active", auction.getId());
         }
 
-        auctionRepository.delete(auction);
+        auction.setDeleted(true);
+        auctionRepository.save(auction);
     }
 
     @Override
@@ -189,5 +209,41 @@ public class AuctionServiceImpl implements AuctionService {
         return auctionWatchRepository.findAllByAuction_Id(id)
                 .stream()
                 .toList();
+    }
+
+    @Override
+    public Boolean existsByProductId(UUID productId) {
+        return auctionRepository.existsByProductId(productId);
+    }
+
+    @Override
+    public void restoreAuction(UUID auctionId) {
+        var auction = auctionRepository.findById(auctionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", auctionId.toString()));
+
+        auction.setDeleted(false);
+        auctionRepository.save(auction);
+    }
+
+    @Override
+    public void assertUserOwnsAuction(UUID userId, Auction auction) {
+        if (!Objects.equals(userId, auction.getSellerId())) {
+            throw new UnauthorizedException(
+                    "User does not own this auction. Expected sellerId=%s but found %s"
+                            .formatted(auction.getSellerId(), userId)
+            );
+        }
+    }
+
+    @Override
+    public AuctionResponse findListedAuctionByProductId(UUID productId) {
+        var auction = auctionRepository.findAuctionByProductIdAndDeletedFalseAndStatusIn(productId,
+                List.of(AuctionStatus.SCHEDULED,
+                        AuctionStatus.STARTED,
+                        AuctionStatus.PAUSED,
+                        AuctionStatus.ACTIVE)
+        ).orElseThrow(() -> new ResourceNotFoundException("Auction", "productId", productId.toString()));
+
+        return AuctionMapper.toResponseDto(auction);
     }
 }

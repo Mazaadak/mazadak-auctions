@@ -4,6 +4,7 @@ import com.mazadak.auctions.dto.request.AuctionFilterDto;
 import com.mazadak.auctions.dto.request.CreateAuctionRequest;
 import com.mazadak.auctions.dto.request.UpdateAuctionRequest;
 import com.mazadak.auctions.dto.response.AuctionResponse;
+import com.mazadak.auctions.model.entity.Auction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,7 +16,7 @@ public interface AuctionService {
     // CRUD
     AuctionResponse findAuctionById(UUID id);
     Page<AuctionResponse> findAuctionsByCriteria(AuctionFilterDto filter, Pageable pageable);
-    AuctionResponse createAuction(CreateAuctionRequest dto);
+    AuctionResponse createAuction(UUID idempotencyKey, CreateAuctionRequest dto);
     AuctionResponse updateAuction(UUID id, UpdateAuctionRequest request);
     void deleteById(UUID id);
 
@@ -28,4 +29,11 @@ public interface AuctionService {
     void addWatcher(UUID id, UUID userId);
     void removeWatcher(UUID id, UUID userId);
     List<Long> getWatcherIds(UUID id);
+
+    Boolean existsByProductId(UUID productId);
+
+    void restoreAuction(UUID auctionId);
+    void assertUserOwnsAuction(UUID userId, Auction auction);
+
+    AuctionResponse findListedAuctionByProductId(UUID productId);
 }
