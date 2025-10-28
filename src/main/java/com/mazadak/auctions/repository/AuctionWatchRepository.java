@@ -1,5 +1,6 @@
 package com.mazadak.auctions.repository;
 
+import com.mazadak.auctions.model.entity.Auction;
 import com.mazadak.auctions.model.entity.AuctionWatch;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,4 +12,8 @@ public interface AuctionWatchRepository extends JpaRepository<AuctionWatch, UUID
     Optional<AuctionWatch> findAuctionWatchByUserIdAndAuction_Id(UUID userId, UUID auctionId);
 
     List<Long> findAllByAuction_Id(UUID auctionId);
+
+    Boolean existsByUserIdAndId(UUID userId, UUID id);
+
+    List<AuctionWatch> findAllByUserId(UUID userId);
 }

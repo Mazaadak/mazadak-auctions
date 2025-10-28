@@ -4,9 +4,12 @@ import com.mazadak.auctions.dto.request.AuctionFilterDto;
 import com.mazadak.auctions.dto.request.CreateAuctionRequest;
 import com.mazadak.auctions.dto.request.UpdateAuctionRequest;
 import com.mazadak.auctions.dto.response.AuctionResponse;
+import com.mazadak.auctions.dto.response.AuctionWatchResponse;
+import com.mazadak.auctions.model.entity.Auction;
 import com.mazadak.auctions.service.AuctionService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -114,5 +117,16 @@ public class AuctionController {
     @GetMapping("/products/{productId}")
     AuctionResponse getByProductId(@PathVariable UUID productId) {
         return auctionService.findListedAuctionByProductId(productId);
+    }
+
+    @GetMapping("{auctionId}/is-watched")
+    ResponseEntity<Boolean> isWatched(@RequestHeader("X-User-Id") UUID userId,
+                                      @PathVariable UUID auctionId) {
+        return ResponseEntity.ok(auctionService.isUserWatchingAuction(userId, auctionId));
+    }
+
+    @GetMapping("/watchlist")
+    ResponseEntity<List<AuctionWatchResponse>> getWatchlist(@RequestHeader("X-User-Id") UUID userId) {
+        return ResponseEntity.ok(auctionService.getWatchlist(userId));
     }
 }

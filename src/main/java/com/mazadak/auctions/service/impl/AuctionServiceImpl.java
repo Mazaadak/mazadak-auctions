@@ -4,8 +4,10 @@ import com.mazadak.auctions.dto.request.AuctionFilterDto;
 import com.mazadak.auctions.dto.request.CreateAuctionRequest;
 import com.mazadak.auctions.dto.request.UpdateAuctionRequest;
 import com.mazadak.auctions.dto.response.AuctionResponse;
+import com.mazadak.auctions.dto.response.AuctionWatchResponse;
 import com.mazadak.auctions.exception.*;
 import com.mazadak.auctions.mapper.AuctionMapper;
+import com.mazadak.auctions.mapper.AuctionWatchMapper;
 import com.mazadak.auctions.model.entity.Auction;
 import com.mazadak.auctions.model.entity.AuctionWatch;
 import com.mazadak.auctions.model.entity.IdempotencyRecord;
@@ -212,6 +214,14 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
+    public List<AuctionWatchResponse> getWatchlist(UUID userId) {
+        return auctionWatchRepository.findAllByUserId(userId)
+                .stream()
+                .map(AuctionWatchMapper::toResponse)
+                .toList();
+    }
+
+    @Override
     public Boolean existsByProductId(UUID productId) {
         return auctionRepository.existsByProductId(productId);
     }
@@ -245,5 +255,10 @@ public class AuctionServiceImpl implements AuctionService {
         ).orElseThrow(() -> new ResourceNotFoundException("Auction", "productId", productId.toString()));
 
         return AuctionMapper.toResponseDto(auction);
+    }
+
+    @Override
+    public Boolean isUserWatchingAuction(UUID userId, UUID auctionId) {
+        return auctionWatchRepository.existsByUserIdAndId(userId, auctionId);
     }
 }
