@@ -29,7 +29,7 @@ public interface AuctionService {
     // WATCH
     void addWatcher(UUID id, UUID userId);
     void removeWatcher(UUID id, UUID userId);
-    List<Long> getWatcherIds(UUID id);
+    List<UUID> getWatcherIds(UUID id);
     List<AuctionWatchResponse> getWatchlist(UUID userId);
 
     Boolean isUserWatchingAuction(UUID userId, UUID auctionId);

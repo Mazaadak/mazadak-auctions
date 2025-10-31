@@ -9,7 +9,9 @@ import com.mazadak.auctions.model.entity.Auction;
 import com.mazadak.auctions.model.entity.OutboxEvent;
 import com.mazadak.auctions.model.enumeration.AuctionStatus;
 import com.mazadak.auctions.repository.AuctionRepository;
+import com.mazadak.auctions.repository.AuctionWatchRepository;
 import com.mazadak.auctions.repository.OutboxEventRepository;
+import com.mazadak.auctions.service.AuctionWatchService;
 import com.mazadak.auctions.service.BidService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,8 @@ public class AuctionStatusJob {
     private final OutboxEventRepository outboxEventRepository;
     private final ObjectMapper objectMapper;
     private final BidService bidService;
+    private final AuctionWatchRepository auctionWatchRepository;
+    private final AuctionWatchService auctionWatchService;
 
     @Scheduled(cron = "0 * * * * *")
     @Transactional
@@ -81,7 +85,12 @@ public class AuctionStatusJob {
         auction.setStatus(AuctionStatus.STARTED);
 
         try {
-            var event = new AuctionStartedEvent(auction.getId(), auction.getTitle(), auction.getStartTime());
+            var event = new AuctionStartedEvent(auction.getId(),
+                    auction.getProductId(),
+                    auction.getTitle(),
+                    auction.getStartTime(),
+                    auctionWatchService.getById(auction.getId())
+            );
             var outboxEvent = new OutboxEvent("Auction",
                     "AuctionStarted",
                     objectMapper.writeValueAsString(event),
@@ -97,7 +106,11 @@ public class AuctionStatusJob {
         log.info("Ending auction {}", auction.getId());
         auction.setStatus(AuctionStatus.ENDED);
         try {
-            var event = new AuctionEndedEvent(AuctionMapper.toResponseDto(auction), bidService.getHighestBidForEachBidderAboveReservePrice(auction.getId()));
+            var event = new AuctionEndedEvent(
+                    AuctionMapper.toResponseDto(auction),
+                    bidService.getHighestBidForEachBidderAboveReservePrice(auction.getId()),
+                    auctionWatchService.getById(auction.getId())
+            );
             var outboxEvent = new OutboxEvent(
                     "AuctionEndedEvent",
                     "AuctionEnded",

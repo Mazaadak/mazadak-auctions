@@ -104,7 +104,7 @@ public class AuctionController {
     }
 
     @GetMapping("{id}/watchers")
-    ResponseEntity<List<Long>> getWatchers(@PathVariable UUID id) {
+    ResponseEntity<List<UUID>> getWatchers(@PathVariable UUID id) {
         return ResponseEntity.ok(auctionService.getWatcherIds(id));
     }
 

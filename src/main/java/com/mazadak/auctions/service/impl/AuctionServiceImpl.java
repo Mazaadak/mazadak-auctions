@@ -1,5 +1,8 @@
 package com.mazadak.auctions.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mazadak.auctions.dto.event.AuctionDeletedEvent;
 import com.mazadak.auctions.dto.request.AuctionFilterDto;
 import com.mazadak.auctions.dto.request.CreateAuctionRequest;
 import com.mazadak.auctions.dto.request.UpdateAuctionRequest;
@@ -11,14 +14,17 @@ import com.mazadak.auctions.mapper.AuctionWatchMapper;
 import com.mazadak.auctions.model.entity.Auction;
 import com.mazadak.auctions.model.entity.AuctionWatch;
 import com.mazadak.auctions.model.entity.IdempotencyRecord;
+import com.mazadak.auctions.model.entity.OutboxEvent;
 import com.mazadak.auctions.model.enumeration.AuctionStatus;
 import com.mazadak.auctions.repository.AuctionRepository;
 import com.mazadak.auctions.repository.AuctionWatchRepository;
 import com.mazadak.auctions.repository.IdempotencyRepository;
+import com.mazadak.auctions.repository.OutboxEventRepository;
 import com.mazadak.auctions.repository.specification.AuctionSpecifications;
 import com.mazadak.auctions.service.AuctionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,22 +39,26 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuctionServiceImpl implements AuctionService {
     private final AuctionRepository auctionRepository;
     private final AuctionWatchRepository auctionWatchRepository;
     private final IdempotencyRepository idempotencyRepository;
+    private final ObjectMapper objectMapper;
+    private final OutboxEventRepository outboxEventRepository;
 
     @Override
     public AuctionResponse findAuctionById(UUID id) {
         var auction = auctionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction", "Id", id.toString()));
-
         return AuctionMapper.toResponseDto(auction);
     }
 
     @Override
     public Page<AuctionResponse> findAuctionsByCriteria(AuctionFilterDto filter, Pageable pageable) {
-        Specification<Auction> specification = AuctionSpecifications.buildFromFilter(filter);
+        Specification<Auction> specification = AuctionSpecifications.buildFromFilter(filter)
+                .and((root, query, builder) -> builder.isFalse(root.get("deleted")));
+
         return auctionRepository.findAll(specification, pageable)
                 .map(AuctionMapper::toResponseDto);
     }
@@ -129,6 +139,7 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
+    @Transactional
     public void deleteById(UUID id) {
         var auction = auctionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", id.toString()));
@@ -138,6 +149,20 @@ public class AuctionServiceImpl implements AuctionService {
         }
 
         auction.setDeleted(true);
+
+        var deletedEvent = new AuctionDeletedEvent(id, auction.getProductId());
+        try {
+            var outboxEvent = new OutboxEvent(
+                    "Auction",
+                    "AuctionDeleted",
+                    objectMapper.writeValueAsString(deletedEvent),
+                    false
+            );
+            outboxEventRepository.save(outboxEvent);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to serialize AuctionDeletedEvent for auction {}", id, e);
+        }
+
         auctionRepository.save(auction);
     }
 
@@ -207,9 +232,10 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public List<Long> getWatcherIds(UUID id) {
+    public List<UUID> getWatcherIds(UUID id) {
         return auctionWatchRepository.findAllByAuction_Id(id)
                 .stream()
+                .map(AuctionWatch::getUserId)
                 .toList();
     }
 
@@ -223,7 +249,7 @@ public class AuctionServiceImpl implements AuctionService {
 
     @Override
     public Boolean existsByProductId(UUID productId) {
-        return auctionRepository.existsByProductId(productId);
+        return auctionRepository.existsByProductIdAndDeletedFalse(productId);
     }
 
     @Override

@@ -15,7 +15,7 @@ public enum AuctionStatus {
             case ACTIVE -> target == ENDED || target == ACTIVE;
             case ENDED -> target == ENDED;
             case CANCELLED -> target == CANCELLED;
-            case PAUSED -> target == STARTED || target == PAUSED;
+            case PAUSED -> target == STARTED || target == PAUSED || target == ENDED;
         };
     }
 }

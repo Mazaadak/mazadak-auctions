@@ -47,6 +47,7 @@ public class OutboxPublisher {
         return switch (eventType) {
             case "AuctionStarted" -> AuctionMessagingConstants.AUCTION_STARTED_BINDING;
             case "AuctionEnded" -> AuctionMessagingConstants.AUCTION_ENDED_BINDING;
+            case "AuctionDeleted" -> AuctionMessagingConstants.AUCTION_DELETED_BINDING;
             default -> null;
         };
     }

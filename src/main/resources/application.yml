@@ -34,6 +34,9 @@ spring:
         auctionEnded-out-0:
           destination: auction-ended
           content-type: application/json
+        auctionDeleted-out-0:
+          destination: auction-deleted
+          content-type: application/json
       kafka:
         binder:
           brokers: localhost:9092

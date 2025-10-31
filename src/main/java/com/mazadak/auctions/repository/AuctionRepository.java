@@ -48,4 +48,6 @@ public interface AuctionRepository extends JpaRepository<Auction, UUID>, JpaSpec
     Boolean listedAuctionExistsForProduct(UUID productId);
 
     Optional<Auction> findAuctionByProductIdAndDeletedFalseAndStatusIn(UUID productId, Collection<AuctionStatus> statuses);
+
+    Boolean existsByProductIdAndDeletedFalse(UUID productId);
 }
