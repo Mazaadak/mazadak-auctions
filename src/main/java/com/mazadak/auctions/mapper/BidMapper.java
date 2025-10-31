@@ -23,7 +23,7 @@ public class BidMapper {
                 bid.getAuctionId(),
                 bid.getBidderId(),
                 bid.getAmount(),
-                bid.getIdempotencyKey()
+                bid.getCreatedAt()
         );
     }
 

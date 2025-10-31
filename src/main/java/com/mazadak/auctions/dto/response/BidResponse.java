@@ -5,6 +5,7 @@ import lombok.Value;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.UUID;
 
 
@@ -20,5 +21,5 @@ public record BidResponse(
         UUID auctionId,
         UUID bidderId,
         BigDecimal amount,
-        String idempotencyKey // TODO: remove
+        Instant createdAt
 ) implements Serializable { }
