@@ -29,7 +29,8 @@ public interface BidRepository extends JpaRepository<Bid, UUID> {
            FROM bids sb 
            INNER JOIN auctions a
            ON sb.auction_id = a.id
-           WHERE sb.auction_id = :auctionId AND sb.amount >= a.reserve_price
+           WHERE sb.auction_id = :auctionId 
+             AND (a.reserve_price IS NULL OR sb.amount >= a.reserve_price)
            GROUP BY bidder_id
        ) AS sub ON b.bidder_id = sub.bidder_id
            AND b.amount = sub.max_amount
