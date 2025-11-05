@@ -25,7 +25,7 @@ spring:
     bus:
       enabled: false
     function:
-      definition:
+      definition: auctionCompleted;auctionInvalid
     stream:
       bindings:
         auctionStarted-out-0:
@@ -37,6 +37,12 @@ spring:
         auctionDeleted-out-0:
           destination: auction-deleted
           content-type: application/json
+        auctionInvalid-in-0:
+          destination: auction-invalid
+          group: auctions-service
+        auctionCompleted-in-0:
+          destination: auction-completed
+          group: auctions-service
       kafka:
         binder:
           brokers: localhost:9092

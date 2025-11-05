@@ -6,6 +6,7 @@ import com.mazadak.auctions.dto.request.UpdateAuctionRequest;
 import com.mazadak.auctions.dto.response.AuctionResponse;
 import com.mazadak.auctions.dto.response.AuctionWatchResponse;
 import com.mazadak.auctions.model.entity.Auction;
+import com.mazadak.auctions.model.enumeration.AuctionStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -40,4 +41,6 @@ public interface AuctionService {
     void assertUserOwnsAuction(UUID userId, Auction auction);
 
     AuctionResponse findListedAuctionByProductId(UUID productId);
+
+    void setAuctionStatus(UUID auctionId, AuctionStatus auctionStatus);
 }

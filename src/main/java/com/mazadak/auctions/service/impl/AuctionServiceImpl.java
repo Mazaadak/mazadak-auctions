@@ -291,6 +291,15 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
+    public void setAuctionStatus(UUID auctionId, AuctionStatus auctionStatus) {
+        var auction = auctionRepository.findById(auctionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", auctionId.toString()));
+
+        auction.setStatus(auctionStatus);
+        auctionRepository.save(auction);
+    }
+
+    @Override
     public Boolean isUserWatchingAuction(UUID userId, UUID auctionId) {
         return auctionWatchRepository.existsByUserIdAndId(userId, auctionId);
     }
