@@ -9,15 +9,12 @@ import com.mazadak.auctions.model.entity.Auction;
 import com.mazadak.auctions.model.entity.OutboxEvent;
 import com.mazadak.auctions.model.enumeration.AuctionStatus;
 import com.mazadak.auctions.repository.AuctionRepository;
-import com.mazadak.auctions.repository.AuctionWatchRepository;
 import com.mazadak.auctions.repository.OutboxEventRepository;
 import com.mazadak.auctions.service.AuctionWatchService;
 import com.mazadak.auctions.service.BidService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -32,12 +29,11 @@ public class AuctionStatusJob {
     private final OutboxEventRepository outboxEventRepository;
     private final ObjectMapper objectMapper;
     private final BidService bidService;
-    private final AuctionWatchRepository auctionWatchRepository;
     private final AuctionWatchService auctionWatchService;
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0/15 * * * * *")
     @Transactional
-    public void updateAuctionStatuses() {
+    public void safetyNetUpdate() {
         var now = LocalDateTime.now();
 
         var dueAuctions = auctionRepository.findDueAuctions(now);
