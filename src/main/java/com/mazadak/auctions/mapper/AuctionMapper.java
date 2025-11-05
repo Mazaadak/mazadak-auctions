@@ -34,6 +34,7 @@ public class AuctionMapper {
                 dto.startTime(),
                 dto.endTime(),
                 AuctionStatus.SCHEDULED,
+                null,
                 false
         );
     }

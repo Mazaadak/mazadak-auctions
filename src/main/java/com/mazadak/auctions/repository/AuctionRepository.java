@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.List;
 import org.springframework.data.jpa.repository.Lock;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,4 +49,6 @@ public interface AuctionRepository extends JpaRepository<Auction, UUID>, JpaSpec
     Optional<Auction> findAuctionByProductIdAndDeletedFalseAndStatusIn(UUID productId, Collection<AuctionStatus> statuses);
 
     Boolean existsByProductIdAndDeletedFalse(UUID productId);
+
+    Optional<Auction> findByIdempotencyKey(UUID idempotencyKey);
 }

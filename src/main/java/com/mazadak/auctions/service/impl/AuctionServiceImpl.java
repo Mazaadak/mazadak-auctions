@@ -66,21 +66,28 @@ public class AuctionServiceImpl implements AuctionService {
     @Override
     @Transactional
     public AuctionResponse createAuction(UUID idempotencyKey, CreateAuctionRequest dto) {
-        try {
-            var idempotency = new IdempotencyRecord(idempotencyKey, false);
-            idempotencyRepository.save(idempotency);
+        var existingIdempotency = idempotencyRepository.findById(idempotencyKey);
 
-            if (auctionRepository.listedAuctionExistsForProduct(dto.productId())) {
-                throw new ProductAlreadyHasAListedAuctionException("An auction is already listed for product " + dto.productId());
-            }
-
-            var saved = auctionRepository.save(AuctionMapper.toEntity(dto));
-            idempotency.setProcessed(true);
-
-            return AuctionMapper.toResponseDto(saved);
-        } catch (DataIntegrityViolationException e) {
-            throw new IdempotencyKeyAlreadyExistsException(idempotencyKey, "Auction", dto);
+        if (existingIdempotency.isPresent()) {
+            var auction = auctionRepository.findByIdempotencyKey(idempotencyKey)
+                    .orElseThrow(() -> new IllegalStateException("Idempotency record exists but auction not found"));
+            return AuctionMapper.toResponseDto(auction);
         }
+
+        var idempotency = new IdempotencyRecord(idempotencyKey, false);
+        idempotencyRepository.save(idempotency);
+
+        if (auctionRepository.listedAuctionExistsForProduct(dto.productId())) {
+            throw new ProductAlreadyHasAListedAuctionException("An auction is already listed for product " + dto.productId());
+        }
+
+        var entity = AuctionMapper.toEntity(dto);
+        entity.setIdempotencyKey(idempotencyKey);
+        var saved = auctionRepository.save(entity);
+
+        idempotency.setProcessed(true);
+
+        return AuctionMapper.toResponseDto(saved);
     }
 
     @Override

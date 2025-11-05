@@ -49,6 +49,9 @@ public class Auction extends BaseEntity {
     @Setter(AccessLevel.NONE)
     private AuctionStatus status = AuctionStatus.SCHEDULED;
 
+    @Column(name = "idempotency_key", unique = true)
+    private UUID idempotencyKey;
+
     private boolean deleted = false;
 
     public void setStatus(AuctionStatus newStatus) {
