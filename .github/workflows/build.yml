@@ -6,6 +6,10 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   build:
     uses: Mazaadak/.github/.github/workflows/java-build-package-push.yml@main
