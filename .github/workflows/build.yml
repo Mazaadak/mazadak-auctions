@@ -16,4 +16,5 @@ jobs:
     with:
       java-version: '21'
       skip-tests: true
-    secrets: inherit
+    secrets:
+      MAZADAK_GITHUB_PACKAGES_TOKEN: ${{ secrets.MAZADAK_GITHUB_PACKAGES_TOKEN }}
