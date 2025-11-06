@@ -3,7 +3,7 @@ package com.mazadak.auctions.service.impl;
 
 import com.mazadak.auctions.dto.request.ProxyBidRequest;
 import com.mazadak.auctions.dto.response.ProxyBidResponse;
-import com.mazadak.auctions.exception.ResourceNotFoundException;
+import com.mazadak.common.exception.shared.ResourceNotFoundException;
 import com.mazadak.auctions.mapper.ProxyBidMapper;
 import com.mazadak.auctions.model.entity.Auction;
 import com.mazadak.auctions.model.entity.Bid;

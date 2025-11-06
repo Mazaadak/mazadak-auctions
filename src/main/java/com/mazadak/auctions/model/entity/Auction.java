@@ -1,7 +1,7 @@
 package com.mazadak.auctions.model.entity;
 
-import com.mazadak.auctions.exception.InvalidAuctionStatusTransitionException;
 import com.mazadak.auctions.model.enumeration.AuctionStatus;
+import com.mazadak.common.exception.domain.auction.InvalidAuctionStatusTransitionException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -56,7 +56,7 @@ public class Auction extends BaseEntity {
 
     public void setStatus(AuctionStatus newStatus) {
         if (!this.status.canTransitionTo(newStatus)) {
-            throw new InvalidAuctionStatusTransitionException("Cannot transition auction status from " + this.status + " to " + newStatus, this.status, newStatus);
+            throw new InvalidAuctionStatusTransitionException("Cannot transition auction status from " + this.status + " to " + newStatus, this.status.toString(), newStatus.toString());
         }
         this.status = newStatus;
     }

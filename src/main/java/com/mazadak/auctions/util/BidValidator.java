@@ -1,9 +1,9 @@
 package com.mazadak.auctions.util;
 
-import com.mazadak.auctions.exception.InvalidBidException;
 import com.mazadak.auctions.model.entity.Auction;
 import com.mazadak.auctions.model.entity.Bid;
 import com.mazadak.auctions.model.enumeration.AuctionStatus;
+import com.mazadak.common.exception.domain.auction.InvalidBidException;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
