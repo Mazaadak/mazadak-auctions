@@ -16,3 +16,4 @@ jobs:
     with:
       java-version: '21'
       skip-tests: true
+    secrets: inherit
