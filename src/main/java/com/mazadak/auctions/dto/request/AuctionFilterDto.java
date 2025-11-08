@@ -1,9 +1,11 @@
 package com.mazadak.auctions.dto.request;
 
+import com.mazadak.auctions.model.enumeration.AuctionStatus;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public record AuctionFilterDto(
@@ -14,5 +16,6 @@ public record AuctionFilterDto(
         BigDecimal minHighestBid,
         BigDecimal maxHighestBid,
         UUID sellerId,
-        String title) {
+        String title,
+        List<AuctionStatus> statuses) {
 }

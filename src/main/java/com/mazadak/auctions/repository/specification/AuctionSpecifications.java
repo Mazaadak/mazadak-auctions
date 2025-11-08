@@ -2,10 +2,12 @@ package com.mazadak.auctions.repository.specification;
 
 import com.mazadak.auctions.dto.request.AuctionFilterDto;
 import com.mazadak.auctions.model.entity.Auction;
+import com.mazadak.auctions.model.enumeration.AuctionStatus;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public class AuctionSpecifications {
@@ -45,15 +47,21 @@ public class AuctionSpecifications {
         };
     }
 
+    private static Specification<Auction> hasStatuses(List<AuctionStatus> statuses) {
+        return (root, query, builder) -> {
+            if (statuses == null || statuses.isEmpty()) return null;
+            return root.get("status").in(statuses);
+        };
+    }
+
     public static Specification<Auction> buildFromFilter(AuctionFilterDto filter) {
         return Specification.allOf(
                 startsBetween(filter.startAfter(), filter.startsBefore()),
                 endsBetween(filter.endsAfter(), filter.endsBefore()),
                 hasHighestBidBetween(filter.minHighestBid(), filter.maxHighestBid()),
                 hasSellerId(filter.sellerId()),
-                containsTitle(filter.title())
+                containsTitle(filter.title()),
+                hasStatuses(filter.statuses())
         );
     }
-
-    // do we need status ?
 }
