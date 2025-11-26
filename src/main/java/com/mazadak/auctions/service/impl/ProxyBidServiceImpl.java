@@ -59,7 +59,7 @@ public class ProxyBidServiceImpl implements ProxyBidService {
 
         ProxyBid proxyBid = ProxyBidMapper.toEntity(request, auctionId, bidderId);
         proxyBidRepository.save(proxyBid);
-        if (!Objects.equals(auction.getHighestBidPlaced().getBidderId(), proxyBid.getBidderId())) {
+        if (auction.getHighestBidPlaced() == null || !Objects.equals(auction.getHighestBidPlaced().getBidderId(), proxyBid.getBidderId())) {
             triggerProxyBidding(auction);
         }
 
