@@ -50,7 +50,7 @@ public class ProxyBidServiceImpl implements ProxyBidService {
             existingBid.setMaxAmount(request.getMaxAmount());
             proxyBidRepository.save(existingBid);
 
-            if (!Objects.equals(auction.getHighestBidPlaced().getBidderId(), existingBid.getBidderId())) {
+            if (auction.getHighestBidPlaced() == null || !Objects.equals(auction.getHighestBidPlaced().getBidderId(), existingBid.getBidderId())) {
                 triggerProxyBidding(auction);
             }
 
