@@ -5,11 +5,11 @@ spring:
     import: "optional:configserver:http://localhost:18071/"
   jackson:
     time-zone: UTC
-  datasource:
-    url: jdbc:h2:mem:auctiondb;
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+#  datasource:
+#    url: jdbc:h2:mem:auctiondb;
+#    driver-class-name: org.h2.Driver
+#    username: sa
+#    password:
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -18,9 +18,9 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC
-  h2:
-    console:
-      enabled: true
+#  h2:
+#    console:
+#      enabled: true
   cloud:
     bus:
       enabled: false
