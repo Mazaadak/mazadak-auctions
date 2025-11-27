@@ -25,7 +25,7 @@ CREATE TABLE bids (
 @Table(name = "bids", indexes = {
         @Index(name = "idx_auction_amount", columnList = "auction_id, amount DESC, created_at ASC")
 })
-@Getter @Setter @ToString
+@Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
 public class Bid extends BaseEntity {
 

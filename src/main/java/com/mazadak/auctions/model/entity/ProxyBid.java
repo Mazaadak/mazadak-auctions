@@ -22,11 +22,12 @@ CREATE TABLE proxy_bids (
   FOREIGN KEY (auction_id) REFERENCES auctions(auction_id)
 );
 */
+
 @Entity
 @Table(name = "proxy_bids", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"auction_id", "bidder_id"})
 })
-@Getter @Setter @ToString
+@Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
 public class ProxyBid extends BaseEntity {
 

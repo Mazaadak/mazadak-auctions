@@ -9,7 +9,6 @@ import java.util.UUID;
 @Table(name = "auction_watchlist")
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuctionWatch extends BaseEntity {

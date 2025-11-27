@@ -13,7 +13,6 @@ import java.util.UUID;
 @Table(name = "auctions")
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class Auction extends BaseEntity {

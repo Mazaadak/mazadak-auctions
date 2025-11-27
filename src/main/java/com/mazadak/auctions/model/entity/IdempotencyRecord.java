@@ -9,7 +9,6 @@ import java.util.UUID;
 @Table(name = "idempotency_records")
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class IdempotencyRecord {

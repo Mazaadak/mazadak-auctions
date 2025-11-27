@@ -9,7 +9,6 @@ import lombok.*;
 @Table(name = "outbox_events")
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class OutboxEvent extends BaseEntity {
