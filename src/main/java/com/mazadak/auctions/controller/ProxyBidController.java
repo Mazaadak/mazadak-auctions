@@ -31,7 +31,6 @@ import java.util.UUID;
 )
 @AllArgsConstructor
 @Validated
-// TODO: authentication & authorization
 public class ProxyBidController {
 
     private final ProxyBidService proxyBidService;
