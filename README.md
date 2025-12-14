@@ -17,9 +17,6 @@
 - See [Auction Service Wiki Page](https://github.com/Mazaadak/.github/wiki/Auctions-Service) for a detailed breakdown of the service's API endpoints
 - Swagger UI available at `http://localhost:18089/swagger-ui/index.html` when running locally
 
-## Events
-See [Auction Service Wiki Page](https://github.com/Mazaadak/.github/wiki/Auctions-Service) for a detailed breakdown of the service's events
-
 ## How to Run
 You can run it via [Docker Compose](https://github.com/Mazaadak/mazadak-infrastructure) or [Kubernetes](https://github.com/Mazaadak/mazadak-k8s/)
 
