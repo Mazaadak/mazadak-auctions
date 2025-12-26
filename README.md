@@ -4,14 +4,7 @@
 
 - It exposes a REST API, persists auction state, and emits domain events to other services in the Mazadak platform.
 
-## Responsibilities
-- Manage auction lifecycle: create, update, cancel, pause, resume, restore.
-- Provide search & filtering with pagination.
-- Support watchers (add/remove/get).
-- Expose auction lookups by criteria (id, product id, seller, current bid, status, etc.)
-- Serve bid operations (place bid, list bids).
-- Enforce idempotency for creating auctions and placing bids.
-- Publish domain events for downstream services (Order, Notifications).
+- The Auctions Service is the owner of auction and bid state within the platform.
 
 ## API Endpoints
 - See [Auction Service Wiki Page](https://github.com/Mazaadak/.github/wiki/Auctions-Service) for a detailed breakdown of the service's API endpoints
